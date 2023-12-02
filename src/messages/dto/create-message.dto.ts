@@ -1,4 +1,6 @@
-import { IsString, IsNotEmpty } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
+import { Room } from 'src/rooms/schema/room.schema';
+import { User } from 'src/users/schemas/users.schema';
 
 export class CreateMessageDto {
   @IsNotEmpty()
@@ -6,6 +8,22 @@ export class CreateMessageDto {
   content: string;
 
   @IsNotEmpty()
-  @Is
-  sender_id: string;
+  @IsString()
+  sender_id: User;
+
+  @IsNotEmpty()
+  @IsString()
+  receiver_room_id: Room;
+
+  @IsOptional()
+  @IsString()
+  sender_name: string;
+
+  @IsString()
+  @IsOptional()
+  sender_phone: string;
+
+  @IsString()
+  @IsOptional()
+  reaction: string;
 }

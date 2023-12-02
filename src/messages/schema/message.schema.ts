@@ -12,14 +12,14 @@ export class Message {
   @Prop({ type: Date, default: Date.now() })
   sent_at: Date;
 
-  @Prop({ type: mongoose.Schema.ObjectId, ref: 'users' })
-  sender_id: string;
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
+  sender_id: mongoose.Schema.Types.ObjectId;
 
   @Prop()
   reaction: string;
 
-  @Prop({ type: mongoose.Schema.ObjectId, ref: 'rooms' })
-  receiver_room_id: string;
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Room' })
+  receiver_room_id: mongoose.Schema.Types.ObjectId;
 
   @Prop()
   sender_name: string;

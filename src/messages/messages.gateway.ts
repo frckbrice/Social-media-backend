@@ -2,37 +2,49 @@ import {
   WebSocketGateway,
   SubscribeMessage,
   MessageBody,
+  WebSocketServer,
+  OnGatewayConnection,
+  OnGatewayDisconnect,
+  ConnectedSocket,
 } from '@nestjs/websockets';
 import { MessagesService } from './messages.service';
 import { CreateMessageDto } from './dto/create-message.dto';
-import { UpdateMessageDto } from './dto/update-message.dto';
+import { Socket, Server } from 'socket.io';
 
 @WebSocketGateway()
-export class MessagesGateway {
+export class MessagesGateway
+  implements OnGatewayConnection, OnGatewayDisconnect
+{
   constructor(private readonly messagesService: MessagesService) {}
+  @WebSocketServer() server: Server;
 
-  @SubscribeMessage('createMessage')
-  create(@MessageBody() createMessageDto: CreateMessageDto) {
-    return this.messagesService.create(createMessageDto);
+  handleConnection(client: Socket) {
+    console.log(`client connected: ${client.id}`);
   }
 
-  @SubscribeMessage('findAllMessages')
-  findAll() {
-    return this.messagesService.findAll();
+  handleDisconnect(client: Socket) {
+    console.log(`client disconnected: ${client.id}`);
   }
 
-  @SubscribeMessage('findOneMessage')
-  findOne(@MessageBody() id: number) {
-    return this.messagesService.findOne(id);
+  @SubscribeMessage('joinRoom')
+  handleJoinRoom(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
+    client.join(data.room);
+    //* store user to database
+    this.server.to(data.room).emit('message', `${data.name} joined the room`);
+    this.server.emit('message', data);
   }
 
-  @SubscribeMessage('updateMessage')
-  update(@MessageBody() updateMessageDto: UpdateMessageDto) {
-    return this.messagesService.update(updateMessageDto.id, updateMessageDto);
+  @SubscribeMessage('leaveRoom')
+  handleLeaveRoom(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
+    client.leave(data.room);
+    this.server.to(data.room).emit('message', `${data.name} left the room`);
   }
 
-  @SubscribeMessage('removeMessage')
-  remove(@MessageBody() id: number) {
-    return this.messagesService.remove(id);
+  @SubscribeMessage('sendMessage')
+  handleSendMessage(
+    @MessageBody() data: any,
+    @ConnectedSocket() client: Socket,
+  ) {
+    this.server.to(data.room).emit('message', `${client.id}: ${data.message}`);
   }
 }
