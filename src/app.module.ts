@@ -7,7 +7,6 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { UsersModule } from './users/users.module';
 import { RoomsModule } from './rooms/rooms.module';
 import { UnreadMessagesModule } from './unread_messages/unread_messages.module';
-import { UserRoomsModule } from './user_rooms/user_rooms.module';
 import { RoomUsersModule } from './room_users/room_users.module';
 
 @Module({
@@ -21,7 +20,6 @@ import { RoomUsersModule } from './room_users/room_users.module';
     UsersModule,
     RoomsModule,
     UnreadMessagesModule,
-    UserRoomsModule,
     RoomUsersModule,
   ],
   controllers: [AppController],

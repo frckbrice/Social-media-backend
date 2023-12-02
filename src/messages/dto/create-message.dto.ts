@@ -1,6 +1,4 @@
 import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
-import { Room } from 'src/rooms/schema/room.schema';
-import { User } from 'src/users/schemas/users.schema';
 
 export class CreateMessageDto {
   @IsNotEmpty()
@@ -9,11 +7,11 @@ export class CreateMessageDto {
 
   @IsNotEmpty()
   @IsString()
-  sender_id: User;
+  sender_id: string;
 
   @IsNotEmpty()
   @IsString()
-  receiver_room_id: Room;
+  receiver_room_id: string;
 
   @IsOptional()
   @IsString()

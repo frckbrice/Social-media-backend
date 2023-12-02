@@ -5,7 +5,6 @@ export type UserDocument = HydratedDocument<Room>;
 
 @Schema({
   timestamps: true,
-  versionKey: false,
 })
 export class Room {
   @Prop({ required: true })
@@ -17,7 +16,7 @@ export class Room {
   @Prop({ required: true })
   isGroup: boolean;
 
-  @Prop()
+  @Prop({ required: true })
   user_id: mongoose.Schema.Types.ObjectId;
 
   // @Prop({ type: String, enum: ['user', 'admin'], default: 'user' })
@@ -30,7 +29,6 @@ RoomSchema.set('toJSON', {
     returnedObject.id = returnedObject._id.toString();
     delete returnedObject._id;
     delete returnedObject.__v;
-    // the passwordHash should not be revealed
     delete returnedObject.passwordHash;
   },
 });

@@ -6,7 +6,6 @@ export class CreateRoomDto {
   name: string;
 
   @IsString()
-  @IsNotEmpty()
   @IsOptional()
   image: string;
 
