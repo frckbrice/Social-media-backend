@@ -18,9 +18,6 @@ export class Room {
 
   @Prop({ required: true })
   user_id: mongoose.Schema.Types.ObjectId;
-
-  // @Prop({ type: String, enum: ['user', 'admin'], default: 'user' })
-  // role: string;
 }
 export const RoomSchema = SchemaFactory.createForClass(Room);
 

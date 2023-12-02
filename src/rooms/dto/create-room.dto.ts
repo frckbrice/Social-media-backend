@@ -16,7 +16,4 @@ export class CreateRoomDto {
   @IsString()
   @IsNotEmpty()
   user_id: string;
-
-  // @IsIn(['user', 'admin'])
-  // role: string;
 }
