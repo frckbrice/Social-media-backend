@@ -10,9 +10,6 @@ export type UserDocument = HydratedDocument<User>
 
 export class User {
   @Prop()
-  id: string
-
-  @Prop()
   name: string
 
   @Prop()
@@ -22,7 +19,7 @@ export class User {
   phone: string
 
   @Prop()
-  profile: string
+  image: string
 
   @Prop()
   wsId: string

@@ -10,7 +10,7 @@ export class CreateUserDto {
   email: string;
 
   @IsString()
-  picture: string;
+  image: string;
 
   @IsString()
   phone: string;
@@ -19,5 +19,3 @@ export class CreateUserDto {
   wsId: string
 
 }
-
-
