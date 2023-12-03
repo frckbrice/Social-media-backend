@@ -42,9 +42,11 @@ export class MessagesGateway
 
   @SubscribeMessage('sendMessage')
   handleSendMessage(
-    @MessageBody() data: any,
+    @MessageBody() data: CreateMessageDto,
     @ConnectedSocket() client: Socket,
   ) {
-    this.server.to(data.room).emit('message', `${client.id}: ${data.message}`);
+    // this.server.to(data.room).emit('message', `${client.id}: ${data.message}`);
+    console.log('recieved', data);
+    this.server.emit('message', `${client.id}: ${data.content}`);
   }
 }

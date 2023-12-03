@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsBoolean } from 'class-validator';
 
 export class CreateMessageDto {
   @IsNotEmpty()
@@ -24,4 +24,8 @@ export class CreateMessageDto {
   @IsString()
   @IsOptional()
   reaction: string;
+
+  @IsBoolean()
+  @IsNotEmpty()
+  is_read: boolean;
 }
