@@ -9,4 +9,5 @@ export interface Message {
   sender_name: string;
   sender_phone?: string;
   is_read: boolean;
+  timestamp?: Date;
 }
