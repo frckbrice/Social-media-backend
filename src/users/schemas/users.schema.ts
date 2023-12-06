@@ -27,9 +27,6 @@ export class User {
   about: string
 
   @Prop()
-  user_metadata: Object
-
-  @Prop()
   picture: string
 
 }

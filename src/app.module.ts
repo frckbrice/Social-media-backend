@@ -25,6 +25,6 @@ import { RoomUsersModule } from './room_users/room_users.module';
     RoomUsersModule,
   ],
   controllers: [AppController, RoomsController],
-  providers: [AppService, RoomsService],
+  providers: [AppService],
 })
 export class AppModule {}

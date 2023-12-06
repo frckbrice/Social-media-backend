@@ -7,19 +7,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UserService {
-  findByIdAndUpdate(id: string, userUpdate: UpdateUserDto): User | PromiseLike<User> {
-    throw new Error('Method not implemented.');
-  }
-  updateById(id: string, userUpdate: UpdateUserDto): User | PromiseLike<User> {
-    throw new Error('Method not implemented.');
-  }
-  findOneAndUpdate(id: string, userUpdate: UpdateUserDto): User | PromiseLike<User> {
-    throw new Error('Method not implemented.');
-  }
 
-  // updateById(): User | PromiseLike<User> {
-  //   throw new Error('Method not implemented.');
-  // }
   constructor(@InjectModel(User.name) private userModel: Model<User>) {}
 
   async create (createUserDto: CreateUserDto): Promise<User> {
@@ -28,11 +16,13 @@ export class UserService {
     return await createdUser.save();
   }
 
+  // find all users
   async findAll(): Promise<User[]> {
     const users = await this.userModel.find()
     return users;
   }
 
+  // find single room by id
   async findById(id: string): Promise<User> {
     const singleUser = await this.userModel.findById(id)
 
