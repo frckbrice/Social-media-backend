@@ -5,6 +5,7 @@ export type UserDocument = HydratedDocument<Room>;
 
 @Schema({
   timestamps: true,
+  versionKey: false
 })
 export class Room {
   @Prop({ required: true })

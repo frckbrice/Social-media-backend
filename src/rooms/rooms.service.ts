@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { UpdateRoomDto } from './dto/update-room.dto';
 import { Room } from './schema/room.schema';
-import mongoose, { Model } from 'mongoose';
+import mongoose, { Model, Mongoose } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Query } from 'express-serve-static-core'
 import { single } from 'rxjs';
@@ -30,7 +30,8 @@ export class RoomsService {
 
   // find one room by id
   async getSingleRoom(id: string): Promise<Room> {
-    const singleRoom = await this.roomModel.findOne({ user_id: new mongoose.Schema.Types.ObjectId(id) })
+    const userId = new mongoose.Types.ObjectId(id)
+    const singleRoom = await this.roomModel.findOne({ user_id: userId })
     if (!singleRoom) {
       throw new NotFoundException('No room with such id')
     }
@@ -39,7 +40,8 @@ export class RoomsService {
 
   // find room by my_id
   async findByMyId(id: string): Promise<Room[]> {
-    const allRooms = await this.roomModel.find({my_id: new mongoose.Schema.Types.ObjectId(id)})
+    const myId = new mongoose.Types.ObjectId(id)
+    const allRooms = await this.roomModel.find({my_id: myId})
     console.log('these are all rooms', allRooms)
     const sortedArray = allRooms.sort((x, y) => (x.createdAt < y.createdAt) ? 1 : (x.createdAt > y.createdAt) ? -1 : 0)
     console.log('sorted array', sortedArray)
