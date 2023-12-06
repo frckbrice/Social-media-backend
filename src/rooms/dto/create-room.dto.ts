@@ -19,4 +19,8 @@ export class CreateRoomDto {
   @IsString()
   @IsNotEmpty()
   user_id: string;
+
+  @IsString()
+  @IsNotEmpty()
+  my_id: string
 }

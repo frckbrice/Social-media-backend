@@ -18,6 +18,9 @@ export class Room {
 
   @Prop({ required: true })
   user_id: mongoose.Schema.Types.ObjectId;
+  
+  @Prop({required: true})
+  my_id: mongoose.Schema.Types.ObjectId
 }
 export const RoomSchema = SchemaFactory.createForClass(Room);
 

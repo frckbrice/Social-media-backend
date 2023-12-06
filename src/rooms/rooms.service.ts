@@ -4,14 +4,15 @@ import { UpdateRoomDto } from './dto/update-room.dto';
 import { Room } from './schema/room.schema';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
+import { Query } from 'express-serve-static-core'
 
 @Injectable()
 export class RoomsService {
   create(createRoomDto: CreateRoomDto) {
     throw new Error('Method not implemented.');
   }
-  
-  constructor(@InjectModel(Room.name) private roomModel: Model<Room>) {}
+
+  constructor(@InjectModel(Room.name) private roomModel: Model<Room>) { }
 
   // create new room
   async createRoom(createRoomDto: CreateRoomDto): Promise<Room> {
@@ -34,9 +35,9 @@ export class RoomsService {
     }
     return singleRoom
   }
- 
+
   // find One room by id and update
-  async updateRoom (id: string, update: UpdateRoomDto): Promise<Room> {
+  async updateRoom(id: string, update: UpdateRoomDto): Promise<Room> {
     return await this.roomModel.findByIdAndUpdate(id, update, {
       new: true,
       runValidators: true
@@ -45,6 +46,20 @@ export class RoomsService {
 
   // delete room
   async deleteRoom(id: string) {
-    return await this.roomModel.findByIdAndDelete(id) 
+    return await this.roomModel.findByIdAndDelete(id)
+  }
+
+  // search for single room by query
+  async searchAll(query: Query): Promise<{}> {
+
+    console.log('this is query', query)
+    const keyword = query.keyword ? {
+      name: {
+        $regex: query.keyword,
+        $options: 'i'
+      }
+    } : {}
+    const searchedRoom = await this.roomModel.find({ ...keyword })
+    return searchedRoom
   }
 }
