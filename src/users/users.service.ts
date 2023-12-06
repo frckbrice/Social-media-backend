@@ -19,6 +19,7 @@ export class UserService {
     console.log('Payload from service', email)
     const existEmail = await this.userModel.findOne({ email })
 
+    console.log('this is user', existEmail)
     if (existEmail) {
       console.log("email already exist")
       return

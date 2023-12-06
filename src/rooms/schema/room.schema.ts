@@ -21,6 +21,9 @@ export class Room {
   
   @Prop({required: true})
   my_id: mongoose.Schema.Types.ObjectId
+
+  @Prop()
+  createdAt: string
 }
 export const RoomSchema = SchemaFactory.createForClass(Room);
 

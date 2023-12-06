@@ -28,6 +28,12 @@ export class RoomsController {
     return this.roomsService.getSingleRoom(id);
   }
 
+  // find rooms with my_id
+  @Get('/my_dm/:id')
+  findOneByMyId (@Param('id') id: string) {
+    return this.roomsService.findByMyId(id)
+  }
+
   // update single room
   @Put(':id')
   update(@Param('id') id: string, @Body() updateRoomDto: UpdateRoomDto) {
