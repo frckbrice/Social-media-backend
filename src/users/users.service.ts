@@ -9,9 +9,19 @@ import { UpdateUserDto } from './dto/update-user.dto';
 export class UserService {
   constructor(@InjectModel(User.name) private userModel: Model<User>) {}
 
+  // create new user
   async create(createUserDto: CreateUserDto): Promise<User> {
     const createdUser = new this.userModel(createUserDto);
-    console.log('Payload from service', createdUser);
+
+    const email = createdUser.email;
+    console.log('Payload from service', email);
+    const existEmail = await this.userModel.findOne({ email });
+
+    console.log('this is user', existEmail);
+    if (existEmail) {
+      console.log('email already exist');
+      return;
+    }
     return await createdUser.save();
   }
 
