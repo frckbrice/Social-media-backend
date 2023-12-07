@@ -6,4 +6,5 @@ export interface Room {
   updated_at?: string;
   user_id: string;
   isGroup: boolean;
+  my_id: string;
 }
