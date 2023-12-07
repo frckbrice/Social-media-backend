@@ -1,7 +1,8 @@
 import { Prop, SchemaFactory, Schema } from '@nestjs/mongoose';
-import mongoose, { Document } from 'mongoose';
+import mongoose, { Document, HydratedDocument } from 'mongoose';
 
-Schema({ timestamps: true, versionKey: false });
+export type RoomUserDocument = HydratedDocument<RoomUser>
+@Schema({ timestamps: true, versionKey: false })
 
 export class RoomUser extends Document {
 

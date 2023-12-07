@@ -19,5 +19,5 @@ export class CreateRoomDto {
 
   @IsString()
   @IsOptional()
-  my_id: string
+  my_id: string;
 }

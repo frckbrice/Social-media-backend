@@ -3,6 +3,7 @@ import { UserService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './interface/user.interface';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { Room } from 'src/rooms/schema/room.schema';
 
 @Controller('users')
 export class UsersController {
@@ -22,7 +23,7 @@ export class UsersController {
 
   // post new user
   @Post()
-  create(@Body() createUserDto: CreateUserDto): Promise<User> {
+  create(@Body() createUserDto: CreateUserDto): Promise<Room> {
     // console.log('Payload from controller', createUserDto)
     return this.userService.create(createUserDto);
   }
