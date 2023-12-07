@@ -14,10 +14,10 @@ export class CreateRoomDto {
   isGroup: boolean;
 
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   user_id: string;
 
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   my_id: string
 }

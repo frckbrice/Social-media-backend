@@ -17,10 +17,10 @@ export class Room {
   @Prop({ required: true })
   isGroup: boolean;
 
-  @Prop({ required: true })
+  @Prop()
   user_id: mongoose.Schema.Types.ObjectId;
   
-  @Prop({required: true})
+  @Prop()
   my_id: mongoose.Schema.Types.ObjectId
 
   @Prop()
