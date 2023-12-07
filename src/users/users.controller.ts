@@ -23,7 +23,7 @@ export class UsersController {
 
   // post new user
   @Post()
-  create(@Body() createUserDto: CreateUserDto): Promise<Room> {
+  create(@Body() createUserDto: CreateUserDto): Promise<any> {
     // console.log('Payload from controller', createUserDto)
     return this.userService.create(createUserDto);
   }

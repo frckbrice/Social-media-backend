@@ -15,7 +15,7 @@ export class UserService {
   ) {}
 
   // create new user
-  async create(createUserDto: CreateUserDto): Promise<Room> {
+  async create(createUserDto: CreateUserDto): Promise<any> {
     const createdUser = new this.userModel(createUserDto);
 
     const email = createdUser.email;
@@ -28,27 +28,28 @@ export class UserService {
         name: '',
         image: '',
         isGroup: false,
-        user_id: existEmail.id,
+        user_id: existEmail?.id,
         my_id: '',
       });
       if (existRoom) {
         console.log('email already exist');
         console.log('this is my object', existRoom);
-        return existRoom;
+        return { ...existRoom, phone: existEmail?.phone };
       }
     }
     const user = await createdUser.save();
+
     const id = JSON.stringify(user.id);
     const newRoom: Room = {
-      name: user.name,
-      image: user.image,
+      name: user?.name,
+      image: user?.image,
       isGroup: false,
       user_id: id,
       my_id: '',
     };
 
     const newRoomUser: Room = await this.roomService.createRoom(newRoom);
-    return newRoomUser;
+    return { ...newRoomUser, phone: user?.phone };
   }
 
   // find all users
@@ -59,7 +60,8 @@ export class UserService {
 
   // find single room by id
   async findById(id: string): Promise<User> {
-    const singleUser = await this.userModel.findById(id);
+    const newId = new mongoose.Types.ObjectId(id);
+    const singleUser = await this.userModel.findById(newId);
 
     if (!singleUser) {
       throw new NotFoundException('No existing user with that id');
@@ -69,7 +71,8 @@ export class UserService {
 
   // update the user by id
   async updateUserInfo(id: string, update: UpdateUserDto): Promise<User> {
-    return await this.userModel.findByIdAndUpdate(id, update, {
+    const newId = new mongoose.Types.ObjectId(id);
+    return await this.userModel.findByIdAndUpdate({ _id: newId }, update, {
       new: true,
       runValidator: true,
     });
