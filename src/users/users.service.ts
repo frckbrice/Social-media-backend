@@ -17,12 +17,13 @@ export class UserService {
     
     const email = createdUser.email
     console.log('Payload from service', email)
-    const existEmail = await this.userModel.findOne({ email })
+    const existEmail = await this.userModel.findOne({ email: email }).exec()
 
-    console.log('this is user', existEmail)
+    console.log('this is my user', existEmail)
     if (existEmail) {
       console.log("email already exist")
-      return
+      console.log('this is my object', existEmail)
+      return existEmail
     }
     return await createdUser.save();
   }
