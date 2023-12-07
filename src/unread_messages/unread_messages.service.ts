@@ -1,11 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUnreadMessageDto } from './dto/create-unread_message.dto';
 import { UpdateUnreadMessageDto } from './dto/update-unread_message.dto';
+import { InjectModel } from '@nestjs/mongoose';
+import { UnreadMessage } from './schema/unread_messages.schema';
+import {Model} from "mongoose"
 
 @Injectable()
 export class UnreadMessagesService {
-  create(createUnreadMessageDto: CreateUnreadMessageDto) {
-    return 'This action adds a new unreadMessage';
+  constructor(@InjectModel(UnreadMessage.name) private unreadMessage: Model<UnreadMessage>) {}
+
+   async create(createUnreadMessageDto: CreateUnreadMessageDto): Promise<UnreadMessage> {
+    const message = new this.unreadMessage(createUnreadMessageDto)
+    return await message.save();
   }
 
   findAll() {

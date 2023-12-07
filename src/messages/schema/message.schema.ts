@@ -36,7 +36,6 @@ import mongoose from 'mongoose';
 // }
 
 // export const MessageSchema = SchemaFactory.createForClass(Message);
-// //*compound index to significantly retrieve message between sender and reciver
 
 export const MessageSchema = new mongoose.Schema({
   content: { type: String, required: true },
