@@ -6,13 +6,13 @@ import {
   Param,
   Delete,
   Put,
-  Query,
+  // Query,
 } from '@nestjs/common';
 import { RoomsService } from './rooms.service';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { UpdateRoomDto } from './dto/update-room.dto';
 import { Room } from './schema/room.schema';
-import { Query as ExpressQuery } from 'express-serve-static-core';
+// import { Query as ExpressQuery } from 'express-serve-static-core';
 
 @Controller('rooms')
 export class RoomsController {
@@ -56,9 +56,9 @@ export class RoomsController {
   }
 
   // find single room by name using query params
-  @Get()
-  async searchSingleRoom(@Query() query: ExpressQuery): Promise<{}> {
-    console.log('from controller', query);
-    return this.roomsService.searchAll(query);
-  }
+  // @Get()
+  // async searchSingleRoom(@Query() query: ExpressQuery): Promise<{}> {
+  //   console.log('from controller', query);
+  //   return this.roomsService.searchAll(query);
+  // }
 }

@@ -1,19 +1,17 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 import { User } from './interface/user.interface';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { CreateRoomDto } from 'src/rooms/dto/create-room.dto';
 import { RoomsService } from 'src/rooms/rooms.service';
-import { Room } from 'src/rooms/schema/room.schema';
+import { Room } from 'src/rooms/interface/room.interface';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectModel('User') private userModel: Model<User>,
     private roomService: RoomsService,
-    private roomModel: Model<Room>,
   ) {}
 
   // create new user
@@ -26,8 +24,12 @@ export class UserService {
 
     console.log('this is my user', existEmail);
     if (existEmail) {
-      const existRoom = await this.roomModel.findOne({
+      const existRoom = await this.roomService.createRoom({
+        name: '',
+        image: '',
+        isGroup: false,
         user_id: existEmail.id,
+        my_id: '',
       });
       if (existRoom) {
         console.log('email already exist');
@@ -36,15 +38,17 @@ export class UserService {
       }
     }
     const user = await createdUser.save();
-    const newRoom = {
+    const id = JSON.stringify(user.id);
+    const newRoom: Room = {
       name: user.name,
       image: user.image,
       isGroup: false,
-      user_id: user.id,
+      user_id: id,
       my_id: '',
     };
 
-    return await this.roomService.createRoom(newRoom);
+    const newRoomUser: Room = await this.roomService.createRoom(newRoom);
+    return newRoomUser;
   }
 
   // find all users
