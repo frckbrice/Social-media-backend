@@ -4,11 +4,12 @@ import { UserService } from './users.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from 'src/users/schemas/users.schema';
 import { RoomsService } from 'src/rooms/rooms.service';
+import { RoomsModule } from 'src/rooms/rooms.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
-    RoomsService
+    RoomsModule
   ],
   controllers: [UsersController],
   providers: [UserService],
