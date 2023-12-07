@@ -15,7 +15,7 @@ export class UserService {
 
     const email = createdUser.email;
     console.log('Payload from service', email);
-    const existEmail = await this.userModel.findOne({ email });
+    const existEmail = await this.userModel.find({ email }).exec();
 
     console.log('this is user', existEmail);
     if (existEmail) {

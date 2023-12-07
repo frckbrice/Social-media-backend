@@ -12,18 +12,17 @@ import mongoose from 'mongoose';
 //   @Prop({ required: true })
 //   content: string;
 
-//   // @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true })
-//   @Prop()
-//   // sender_id: mongoose.Schema.Types.ObjectId;
-//   sender_id: string;
+// @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true })
+
+// sender_id: User;
 
 //   @Prop()
 //   reaction: string;
 
-//   // @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Room', required: true })
+// @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Room', required: true })
 //   @Prop()
 //   // receiver_room_id: mongoose.Schema.Types.ObjectId;
-//   receiver_room_id: string;
+//   receiver_room_id: Room;
 
 //   @Prop({ required: true })
 //   sender_name: string;
@@ -39,8 +38,16 @@ import mongoose from 'mongoose';
 
 export const MessageSchema = new mongoose.Schema({
   content: { type: String, required: true },
-  sender_id: { type: String, required: true },
-  receiver_room_id: { type: String, required: true },
+  sender_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
+  },
+  receiver_room_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Room',
+    required: true,
+  },
   sender_name: String,
   sender_phone: String,
   is_read: { type: Boolean, required: true },

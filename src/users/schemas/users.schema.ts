@@ -28,12 +28,6 @@ export class User {
 
   @Prop()
   about: string;
-
-<<<<<<< HEAD
-  @Prop()
-  picture: string;
-=======
->>>>>>> b3264e2bdabcba197672f1c0ace28bbbfc1328f8
 }
 export const UserSchema = SchemaFactory.createForClass(User);
 

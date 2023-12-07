@@ -1,9 +1,18 @@
-import { Controller, Get, Post, Body, Param, Delete, Put, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Delete,
+  Put,
+  Query,
+} from '@nestjs/common';
 import { RoomsService } from './rooms.service';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { UpdateRoomDto } from './dto/update-room.dto';
 import { Room } from './schema/room.schema';
-import {Query as ExpressQuery} from 'express-serve-static-core'
+import { Query as ExpressQuery } from 'express-serve-static-core';
 
 @Controller('rooms')
 export class RoomsController {
@@ -12,7 +21,7 @@ export class RoomsController {
   // Post rooms
   @Post()
   create(@Body() createRoomDto: CreateRoomDto) {
-    console.log('this is room from body', createRoomDto)
+    console.log('this is room from body', createRoomDto);
     return this.roomsService.createRoom(createRoomDto);
   }
 
@@ -30,8 +39,8 @@ export class RoomsController {
 
   // find rooms with my_id
   @Get('/my_dm/:id')
-  findOneByMyId (@Param('id') id: string) {
-    return this.roomsService.findByMyId(id)
+  findOneByMyId(@Param('id') id: string) {
+    return this.roomsService.findByMyId(id);
   }
 
   // update single room
@@ -48,9 +57,8 @@ export class RoomsController {
 
   // find single room by name using query params
   @Get()
-  async searchSingleRoom (@Query() query: ExpressQuery): Promise<{}> {
-    console.log('from controller', query)
-    return this.roomsService.searchAll(query)
+  async searchSingleRoom(@Query() query: ExpressQuery): Promise<{}> {
+    console.log('from controller', query);
+    return this.roomsService.searchAll(query);
   }
-  
 }
