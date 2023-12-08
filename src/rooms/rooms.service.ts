@@ -13,7 +13,7 @@ export class RoomsService {
   async createRoom(createRoomDto: CreateRoomDto): Promise<Room> {
     const existRoom = await this.roomModel.findOne({
       user_id: createRoomDto.user_id,
-    });
+    }).exec();
     if (existRoom) {
       console.log('email already exist');
       console.log('this is my object', existRoom);
@@ -21,7 +21,7 @@ export class RoomsService {
     }
     const newRoom = new this.roomModel(createRoomDto);
     console.log('payload from service', newRoom);
-    return await newRoom.save();
+    return (await (newRoom.save())).toJSON();
   }
   // get all rooms in the room table
   async getAllRooms(): Promise<Room[]> {
