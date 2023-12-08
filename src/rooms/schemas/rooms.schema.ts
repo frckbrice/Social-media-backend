@@ -15,7 +15,7 @@ export class Room {
   image: string;
 
   @Prop()
-  status: boolean;
+  isGroup: boolean;
 
   @Prop()
   user_id: string;
