@@ -14,6 +14,7 @@ export class RoomsService {
     const existRoom = await this.roomModel
       .findOne({
         user_id: createRoomDto.user_id,
+        my_id: createRoomDto.my_id,
       })
       .exec();
     if (existRoom) {
