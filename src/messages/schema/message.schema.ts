@@ -1,39 +1,59 @@
-import { Prop, SchemaFactory, Schema } from '@nestjs/mongoose';
-import mongoose, { Document } from 'mongoose';
+// import { Prop, SchemaFactory, Schema } from '@nestjs/mongoose';
+// import mongoose, { HydratedDocument } from 'mongoose';
+import mongoose from 'mongoose';
 
-Schema({
-  timestamps: true,
+// export type MessageDocument = HydratedDocument<Message>;
+
+// Schema({
+//   timestamps: true,
+// });
+
+// export class Message {
+//   @Prop({ required: true })
+//   content: string;
+
+// @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true })
+
+// sender_id: User;
+
+//   @Prop()
+//   reaction: string;
+
+// @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Room', required: true })
+//   @Prop()
+//   // receiver_room_id: mongoose.Schema.Types.ObjectId;
+//   receiver_room_id: Room;
+
+//   @Prop({ required: true })
+//   sender_name: string;
+
+//   @Prop()
+//   sender_phone: string;
+
+//   @Prop()
+//   is_read: boolean;
+// }
+
+// export const MessageSchema = SchemaFactory.createForClass(Message);
+
+export const MessageSchema = new mongoose.Schema({
+  content: { type: String, required: true },
+  sender_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
+  },
+  receiver_room_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Room',
+    required: true,
+  },
+  sender_name: String,
+  sender_phone: String,
+  is_read: { type: Boolean, required: true },
+  reaction: String,
+  timestamp: { type: Date, default: Date.now() },
 });
-
-export class Message {
-  @Prop({ required: true })
-  content: string;
-
-  // @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true })
-  // sender_id: mongoose.Schema.Types.ObjectId;
-
-  @Prop({required: true})
-  sender_d: string
-
-  @Prop()
-  reaction: string;
-
-  // @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Room', required: true })
-  // receiver_room_id: mongoose.Schema.Types.ObjectId;
-
-  @Prop({ref: 'Room', required: true})
-  receiver_room_id: string
-
-
-  @Prop({ required: true })
-  sender_name: string;
-
-  @Prop()
-  phone: string;
-}
-
-export const MessageSchema = SchemaFactory.createForClass(Message);
-//*compound index to significantly retrieve message between sender and reciver
 MessageSchema.index({ sender_id: 1, receiver_room_id: 1 });
 
 MessageSchema.set('toJSON', {

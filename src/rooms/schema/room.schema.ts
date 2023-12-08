@@ -5,7 +5,7 @@ export type UserDocument = HydratedDocument<Room>;
 
 @Schema({
   timestamps: true,
-  versionKey: false
+  versionKey: false,
 })
 export class Room {
   @Prop({ required: true })
@@ -17,14 +17,11 @@ export class Room {
   @Prop({ required: true })
   isGroup: boolean;
 
-  @Prop({ required: true })
-  user_id: mongoose.Schema.Types.ObjectId;
-  
-  @Prop({required: true})
-  my_id: mongoose.Schema.Types.ObjectId
+  @Prop()
+  user_id: string;
 
   @Prop()
-  createdAt: string
+  my_id: string;
 }
 export const RoomSchema = SchemaFactory.createForClass(Room);
 

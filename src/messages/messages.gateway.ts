@@ -10,6 +10,9 @@ import {
 import { MessagesService } from './messages.service';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { Socket, Server } from 'socket.io';
+import { Message } from './interface/messages.interface';
+import { UpdateMessageDto } from './dto/update-message.dto';
+// import { CreateRoomDto } from 'src/rooms/dto/create-room.dto';
 
 @WebSocketGateway()
 export class MessagesGateway
@@ -27,11 +30,16 @@ export class MessagesGateway
   }
 
   @SubscribeMessage('joinRoom')
-  handleJoinRoom(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
+  handleJoinRoom(
+    @MessageBody() data: { name: string; room: string },
+    @ConnectedSocket() client: Socket,
+  ) {
+    console.log('joined the room: ', data);
     client.join(data.room);
     //* store user to database
-    this.server.to(data.room).emit('message', `${data.name} joined the room`);
-    this.server.emit('message', data);
+    this.server.to(data.room).emit('message', `${data.room} joined the room`);
+
+    // this.server.emit('message', `welcome to this chat room ${data.room}`);
   }
 
   @SubscribeMessage('leaveRoom')
@@ -41,12 +49,53 @@ export class MessagesGateway
   }
 
   @SubscribeMessage('sendMessage')
-  handleSendMessage(
+  async handleSendMessage(
     @MessageBody() data: CreateMessageDto,
     @ConnectedSocket() client: Socket,
-  ) {
-    // this.server.to(data.room).emit('message', `${client.id}: ${data.message}`);
+  ): Promise<Message> {
+    this.server
+      .to(data.receiver_room_id)
+      .to(data.sender_id)
+      .emit('message', `${client.id}: ${data.content}`);
     console.log('recieved', data);
     this.server.emit('message', `${client.id}: ${data.content}`);
+    return await this.messagesService.createMessage(data);
+  }
+
+  @SubscribeMessage('roomMessages')
+  async getMessages(
+    @MessageBody() data: { [id: string]: string },
+  ): Promise<Message[]> {
+    const roomMessages = await this.messagesService.getMessages(
+      data.sender_room_id,
+      data.receiver_room_id,
+    );
+    this.server.emit('roomMessages', roomMessages);
+    return roomMessages;
+  }
+
+  @SubscribeMessage('updateMessage')
+  async handleUpdateMessage(
+    @MessageBody() data: UpdateMessageDto & any,
+    // @ConnectedSocket() client: Socket,
+  ): Promise<Message> {
+    const updatedMessage = await this.messagesService.updateMessage(
+      data.messageId,
+      data.value,
+    );
+    this.server.emit('updateMessage', updatedMessage);
+    return updatedMessage;
+  }
+
+  @SubscribeMessage('groupMessage')
+  async handleGroupMessage(
+    @MessageBody() data: any,
+    // @ConnectedSocket() client: Socket,
+  ): Promise<Message[]> {
+    const groupMessages = await this.messagesService.getGroupMessage(
+      data.receiver_room_id,
+    );
+    this.server.emit('updateMessage', groupMessages);
+    return groupMessages;
   }
 }

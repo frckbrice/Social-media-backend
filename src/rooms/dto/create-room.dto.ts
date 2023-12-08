@@ -1,9 +1,6 @@
 import { IsString, IsNotEmpty, IsOptional, IsBoolean } from 'class-validator';
 
 export class CreateRoomDto {
-  save(): import("src/rooms/schema/room.schema").Room | PromiseLike<import("src/rooms/schema/room.schema").Room> {
-    throw new Error('Method not implemented.');
-  }
   @IsString()
   @IsNotEmpty()
   name: string;
@@ -17,10 +14,10 @@ export class CreateRoomDto {
   isGroup: boolean;
 
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   user_id: string;
 
   @IsString()
-  @IsNotEmpty()
-  my_id: string
+  @IsOptional()
+  my_id: string;
 }

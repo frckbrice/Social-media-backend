@@ -1,6 +1,9 @@
 import { IsNotEmpty, IsString, IsIn } from 'class-validator';
 
 export class CreateRoomUserDto {
+  save(): import("src/room_users/schema/roomUser.schema").RoomUser | PromiseLike<import("src/room_users/schema/roomUser.schema").RoomUser> {
+    throw new Error('Method not implemented.');
+  }
   @IsString()
   @IsNotEmpty()
   user_id: string;

@@ -8,6 +8,9 @@ export type UserDocument = HydratedDocument<User>;
   versionKey: false,
 })
 export class User {
+  // @Prop()
+  // id: string;
+
   @Prop()
   name: string;
 
@@ -18,19 +21,19 @@ export class User {
   phone: string;
 
   @Prop()
-  image: string
+  image: string;
 
   @Prop()
-  wsId: string
+  wsId: string;
 
   @Prop()
-  about: string
-
+  about: string;
 }
 export const UserSchema = SchemaFactory.createForClass(User);
 
 UserSchema.set('toJSON', {
   transform: (document, returnedObject) => {
+    //we return a string  ID to the front-end
     returnedObject.id = returnedObject._id.toString();
     delete returnedObject._id;
     delete returnedObject.__v;
