@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { Document, HydratedDocument } from 'mongoose';
 
-export type unreadMessageDocument = HydratedDocument<UnreadMessage>
+export type unreadMessageDocument = HydratedDocument<UnreadMessage>;
 
 @Schema({ timestamps: true, versionKey: false })
 export class UnreadMessage extends Document {
@@ -28,15 +28,16 @@ export class UnreadMessage extends Document {
 
 export const UnreadMessageSchema = SchemaFactory.createForClass(UnreadMessage);
 
-UnreadMessageSchema.index({ sender_id: 1, receiver_room_id: 1 });
+UnreadMessageSchema.index(
+  { sender_id: 1, receiver_room_id: 1 },
+  { unique: true },
+);
 
 UnreadMessageSchema.set('toJSON', {
   transform: (document, returnedObject) => {
-    //we return a string  ID to the front-end
     returnedObject.id = returnedObject._id.toString();
     delete returnedObject._id;
     delete returnedObject.__v;
-    // the passwordHash should not be revealed
     delete returnedObject.passwordHash;
   },
 });

@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { UnreadMessagesService } from './unread_messages.service';
 import { CreateUnreadMessageDto } from './dto/create-unread_message.dto';
 import { UpdateUnreadMessageDto } from './dto/update-unread_message.dto';
@@ -9,7 +17,9 @@ export class UnreadMessagesController {
 
   @Post()
   create(@Body() createUnreadMessageDto: CreateUnreadMessageDto) {
-    return this.unreadMessagesService.create(createUnreadMessageDto);
+    return this.unreadMessagesService.createUnreadMessage(
+      createUnreadMessageDto,
+    );
   }
 
   @Get()
@@ -17,13 +27,20 @@ export class UnreadMessagesController {
     return this.unreadMessagesService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.unreadMessagesService.findOne(+id);
+  // @Get(':id')
+  // findOne(@Param('id') id: string) {
+  //   return this.unreadMessagesService.findOneUnreadMessage(+id);
+  // }
+  @Get()
+  findOne(@Body() data: any) {
+    return this.unreadMessagesService.findOneUnreadMessage(data);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUnreadMessageDto: UpdateUnreadMessageDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateUnreadMessageDto: UpdateUnreadMessageDto,
+  ) {
     return this.unreadMessagesService.update(+id, updateUnreadMessageDto);
   }
 

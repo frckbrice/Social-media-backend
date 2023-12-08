@@ -37,15 +37,25 @@ export class MessagesGateway
     console.log('joined the room: ', data);
     client.join(data.room);
     //* store user to database
-    this.server.to(data.room).emit('message', `${data.room} joined the room`);
+    this.server
+      .to(data.room)
+      .emit('message', `${data.name} joined the chat room`);
 
     // this.server.emit('message', `welcome to this chat room ${data.room}`);
   }
 
-  @SubscribeMessage('leaveRoom')
-  handleLeaveRoom(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
-    client.leave(data.room);
-    this.server.to(data.room).emit('message', `${data.name} left the room`);
+  @SubscribeMessage('groupMessage')
+  async handleGroupMessage(
+    @MessageBody() data: any,
+    @ConnectedSocket() client: Socket,
+  ): Promise<Message[]> {
+    const groupMessages = await this.messagesService.getGroupMessage(
+      data.receiver_room_id,
+    );
+    console.log('joined the group message chat: ', data);
+    client.join(data.receiver_room_id);
+    this.server.emit('updateMessage', groupMessages);
+    return groupMessages;
   }
 
   @SubscribeMessage('sendMessage')
@@ -53,13 +63,21 @@ export class MessagesGateway
     @MessageBody() data: CreateMessageDto,
     @ConnectedSocket() client: Socket,
   ): Promise<Message> {
+    console.log('message sent', data);
+    const message = await this.messagesService.createMessage(data);
     this.server
       .to(data.receiver_room_id)
       .to(data.sender_id)
-      .emit('message', `${client.id}: ${data.content}`);
-    console.log('recieved', data);
-    this.server.emit('message', `${client.id}: ${data.content}`);
-    return await this.messagesService.createMessage(data);
+      .emit('message', `${data.receiver_room_id}: ${data.content}`);
+
+    // this.server.emit('message', `${client.id}: ${data.content}`);
+    return message;
+  }
+
+  @SubscribeMessage('leaveRoom')
+  handleLeaveRoom(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
+    client.leave(data.room);
+    this.server.to(data.room).emit('message', `${data.name} left the room`);
   }
 
   @SubscribeMessage('roomMessages')
@@ -85,17 +103,5 @@ export class MessagesGateway
     );
     this.server.emit('updateMessage', updatedMessage);
     return updatedMessage;
-  }
-
-  @SubscribeMessage('groupMessage')
-  async handleGroupMessage(
-    @MessageBody() data: any,
-    // @ConnectedSocket() client: Socket,
-  ): Promise<Message[]> {
-    const groupMessages = await this.messagesService.getGroupMessage(
-      data.receiver_room_id,
-    );
-    this.server.emit('updateMessage', groupMessages);
-    return groupMessages;
   }
 }
