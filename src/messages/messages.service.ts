@@ -5,10 +5,14 @@ import { UpdateMessageDto } from './dto/update-message.dto';
 import { Message } from './interface/messages.interface';
 import { InjectModel } from '@nestjs/mongoose';
 import mongoose, { Model } from 'mongoose';
+import { UnreadMessagesService } from 'src/unread_messages/unread_messages.service';
 
 @Injectable()
 export class MessagesService {
-  constructor(@InjectModel('Message') private messageModel: Model<Message>) {}
+  constructor(
+    @InjectModel('Message') private messageModel: Model<Message>,
+    private unreadMessage: UnreadMessagesService,
+  ) {}
 
   async createMessage(createMessageDto: CreateMessageDto): Promise<Message> {
     if (
@@ -21,6 +25,18 @@ export class MessagesService {
       );
     try {
       const createdMessage = await this.messageModel.create(createMessageDto);
+      // const unread = await this.unreadMessage.findOneUnreadMessage({
+      //   sender_id: createdMessage.sender_id,
+      //   receiver_room_id: createdMessage.receiver_room_id,
+      // });
+      // if (unread)
+
+      const unread = await this.unreadMessage.createUnreadMessage({
+        sender_id: createdMessage.sender_id,
+        receiver_room_id: createdMessage.receiver_room_id,
+        last_message: createdMessage.content,
+      });
+
       return createdMessage;
     } catch (error) {
       if (error instanceof Error) console.log('error creating messages', error);

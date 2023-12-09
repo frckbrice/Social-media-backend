@@ -25,26 +25,27 @@ export class UserService {
     console.log('this is my user', existEmail);
     if (existEmail) {
       const existRoom = await this.roomService.createRoom({
-        name: '',
-        image: '',
+        name: existEmail?.name,
+        image: existEmail?.image,
         isGroup: false,
-        user_id: existEmail?.id,
+        user_id: existEmail?.id.toString(),
         my_id: '',
       });
       if (existRoom) {
         console.log('email already exist');
         console.log('this is my object', existRoom);
+
         return { ...existRoom, phone: existEmail?.phone };
       }
     }
     const user = await createdUser.save();
 
-    // const id = JSON.stringify(user.id);
+    const id = user.id.toString();
     const newRoom: Room = {
       name: user?.name,
       image: user?.image,
       isGroup: false,
-      user_id: user.id,
+      user_id: id,
       my_id: '',
     };
 
