@@ -32,8 +32,7 @@ export class UserService {
         my_id: '',
       });
       if (existRoom) {
-        console.log('email already exist');
-        console.log('this is my object', existRoom);
+        console.log('email already exist', existRoom);
 
         return { ...existRoom, phone: existEmail?.phone };
       }
