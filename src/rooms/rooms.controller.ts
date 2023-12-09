@@ -12,6 +12,7 @@ import { RoomsService } from './rooms.service';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { UpdateRoomDto } from './dto/update-room.dto';
 import { Room } from './schema/room.schema';
+import { DeleteRoomDto } from './dto/delete-room-dto';
 // import { Query as ExpressQuery } from 'express-serve-static-core';
 
 @Controller('rooms')
@@ -50,9 +51,10 @@ export class RoomsController {
   }
 
   // delete single room
-  @Delete(':id')
-  async remove(@Param('id') id: string) {
-    return await this.roomsService.deleteRoom(id);
+  @Delete(':id/:myId')
+  async remove(@Param('id') id: string, @Param('myId') myId: string) {
+    console.log('from roomcontroller', id)
+    return await this.roomsService.deleteRoom(id, myId);
   }
 
   // find single room by name using query params

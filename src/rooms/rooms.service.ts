@@ -2,13 +2,15 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { UpdateRoomDto } from './dto/update-room.dto';
 import { Room } from './schema/room.schema';
-import { Model } from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
+import { DeleteRoomDto } from './dto/delete-room-dto';
 // import { Query } from 'express-serve-static-core';
 
 @Injectable()
 export class RoomsService {
-  constructor(@InjectModel(Room.name) private roomModel: Model<Room>) {}
+  constructor(@InjectModel(Room.name) private roomModel: Model<Room>) { }
+
   // create new room
   async createRoom(createRoomDto: CreateRoomDto): Promise<Room> {
     const existRoom = await this.roomModel
@@ -26,6 +28,7 @@ export class RoomsService {
     console.log('payload from service', newRoom);
     return (await newRoom.save()).toJSON();
   }
+
   // get all rooms in the room table
   async getAllRooms(): Promise<Room[]> {
     const allRooms = await this.roomModel.find();
@@ -57,8 +60,11 @@ export class RoomsService {
     });
   }
   // delete room
-  async deleteRoom(id: string) {
-    return await this.roomModel.findByIdAndDelete(id);
+  async deleteRoom(id: string, myId: string) {
+    const newId = new mongoose.Types.ObjectId(id)
+    console.log('id from roomservice', newId)
+    console.log('myId from roomservice', myId)
+    return await this.roomModel.findOneAndDelete({ _id: newId, my_id: myId });
   }
   // search for single room by query
   // async searchAll(query: Query): Promise<{}> {
