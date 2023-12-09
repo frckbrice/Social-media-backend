@@ -7,4 +7,5 @@ export interface Room {
   user_id: string;
   isGroup: boolean;
   my_id: string;
+  original_dm_roomID: string;
 }

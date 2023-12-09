@@ -1,14 +1,15 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { UpdateRoomDto } from './dto/update-room.dto';
-import { Room } from './schema/room.schema';
+// import { Room } from './schema/room.schema';
+import { Room } from './interface/room.interface';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 // import { Query } from 'express-serve-static-core';
 
 @Injectable()
 export class RoomsService {
-  constructor(@InjectModel(Room.name) private roomModel: Model<Room>) {}
+  constructor(@InjectModel('Room') private roomModel: Model<Room>) {}
   // create new room
   async createRoom(createRoomDto: CreateRoomDto): Promise<Room> {
     const existRoom = await this.roomModel
@@ -22,18 +23,26 @@ export class RoomsService {
 
       return existRoom.toJSON();
     }
-    const newRoom = new this.roomModel(createRoomDto);
+    const originalUserRoom = await this.getSingleRoom(createRoomDto.user_id);
+    console.log(originalUserRoom);
+    const newObject = {
+      ...createRoomDto,
+      original_dm_roomID: originalUserRoom.id,
+    };
+    const newRoom = new this.roomModel(newObject);
     console.log('payload from service', newRoom);
     return (await newRoom.save()).toJSON();
   }
   // get all rooms in the room table
   async getAllRooms(): Promise<Room[]> {
-    const allRooms = await this.roomModel.find();
+    const allRooms = await this.roomModel.find().exec();
     return allRooms;
   }
   // find one room by id
   async getSingleRoom(id: string): Promise<Room> {
-    const singleRoom = await this.roomModel.findOne({ user_id: id });
+    const singleRoom = await this.roomModel
+      .findOne({ user_id: id, my_id: '' })
+      .exec();
     if (!singleRoom) {
       throw new NotFoundException('No room with such id');
     }
