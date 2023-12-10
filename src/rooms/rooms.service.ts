@@ -4,7 +4,6 @@ import { UpdateRoomDto } from './dto/update-room.dto';
 import { Room } from './schema/room.schema';
 import mongoose, { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { DeleteRoomDto } from './dto/delete-room-dto';
 // import { Query } from 'express-serve-static-core';
 
 @Injectable()
@@ -54,6 +53,7 @@ export class RoomsService {
   }
   // find One room by id and update
   async updateRoom(id: string, update: UpdateRoomDto): Promise<Room> {
+    console.log('update from roomService', update)
     return await this.roomModel.findByIdAndUpdate(id, update, {
       new: true,
       runValidators: true,
