@@ -4,11 +4,15 @@ import { UpdateRoomDto } from './dto/update-room.dto';
 import { Room } from './schema/room.schema';
 import mongoose, { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
+import { RoomUsersService } from 'src/room_users/room_users.service';
 // import { Query } from 'express-serve-static-core';
 
 @Injectable()
 export class RoomsService {
-  constructor(@InjectModel(Room.name) private roomModel: Model<Room>) { }
+  constructor(
+    @InjectModel(Room.name) private roomModel: Model<Room>,
+    private roomUserService: RoomUsersService,
+  ) { }
 
   // create new room
   async createRoom(createRoomDto: CreateRoomDto): Promise<Room> {
@@ -65,6 +69,32 @@ export class RoomsService {
     console.log('id from roomservice', newId)
     console.log('myId from roomservice', myId)
     return await this.roomModel.findOneAndDelete({ _id: newId, my_id: myId });
+  }
+
+  // find all groups objects in which a user belongs to
+  async getAllGroupsOfSingleUser(userId: string): Promise<Room[]> {
+    const groupsId = await this.roomUserService.findAllGroupsId(userId)
+    const groups: any[] = []
+    let finalGrps: any[] []
+    const allGrps: any[] = groupsId.map(async(group) => {
+      
+      const newId = new mongoose.Types.ObjectId(group.room_id)
+      const grpArr = await this.roomModel.findOne({ isGroup: true, _id: newId }).exec()
+      // console.log('here is group:', grpArr)
+      // console.log('groups: ', groups)
+      if (grpArr) {
+        groups.push(grpArr)
+        console.log('groups: ', groups)
+      }
+      finalGrps = groups
+      console.log('my groups: ', finalGrps)
+      return groups
+    })
+    console.log('array of groups', finalGrps)
+    if (typeof allGrps) {
+      console.log('array of groups in if', allGrps)
+      return allGrps
+    }
   }
   // search for single room by query
   // async searchAll(query: Query): Promise<{}> {

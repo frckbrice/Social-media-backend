@@ -46,6 +46,7 @@ export class RoomsController {
   // update single room
   @Put(':id')
   update(@Param('id') id: string, @Body() updateRoomDto: UpdateRoomDto) {
+    console.log('from controller', updateRoomDto)
     return this.roomsService.updateRoom(id, updateRoomDto);
   }
 
@@ -54,6 +55,12 @@ export class RoomsController {
   async remove(@Param('id') id: string, @Param('myId') myId: string) {
     console.log('from roomcontroller', id)
     return await this.roomsService.deleteRoom(id, myId);
+  }
+
+  // get all groups of one user
+  @Get('/all_groups/:id')
+  async getAllgroups(@Param('id') id: string) {
+    return await this.roomsService.getAllGroupsOfSingleUser(id)
   }
 
   // find single room by name using query params

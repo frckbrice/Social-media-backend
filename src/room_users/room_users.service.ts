@@ -30,6 +30,12 @@ export class RoomUsersService {
     return participant;
   }
 
+  // find all groups in which a user belongs to
+  async findAllGroupsId (userId: string): Promise<RoomUser[]> {
+    const groupsId = await this.roomUserModel.find({user_id: userId})
+    return groupsId
+  }
+
   // Update roomUser
   update(id: number, updateRoomUserDto: UpdateRoomUserDto) {
     return `This action updates a #${id} roomUser`;

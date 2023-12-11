@@ -10,5 +10,6 @@ import { RoomUser, RoomUserSchema } from './schema/roomUser.schema';
   ],
   controllers: [RoomUsersController],
   providers: [RoomUsersService],
+  exports: [RoomUsersService]
 })
 export class RoomUsersModule {}
