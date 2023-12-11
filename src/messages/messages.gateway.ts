@@ -55,13 +55,13 @@ export class MessagesGateway
 
   @SubscribeMessage('typing')
   async handleHeartbeat(
-    @MessageBody() data: { receiver: string; currentUser: Room },
+    @MessageBody() data: { receiver: Room; currentUser: Room },
   ) {
     // const userRoom = await this.messagesService.getSingleUserRoom(user_id);
     this.can_proceed = false;
     if (data.receiver)
       this.server
-        .to(data.receiver)
+        .to(data.receiver.original_dm_roomID)
         .to(data.currentUser.id)
         .emit('typingResponse', `${data.currentUser.name} is typing`);
   }

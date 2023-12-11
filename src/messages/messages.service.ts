@@ -32,6 +32,7 @@ export class MessagesService {
       );
     try {
       const createdMessage = await this.messageModel.create(createMessageDto);
+      console.log('value of can_proceed: ', canProceed);
       if (createdMessage && canProceed === true)
         await this.unreadMessage.createUnreadMessage({
           sender_id: createdMessage.sender_id,
