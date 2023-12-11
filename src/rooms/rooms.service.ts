@@ -32,22 +32,21 @@ export class RoomsService {
 
       return existRoom.toJSON();
     } else {
-      const originalUserRoom = await this.getSingleRoom(createRoomDto.user_id);
+      const originalUserRoom = await this.checkExisting(createRoomDto.user_id);
 
+      // not group case
       if (originalUserRoom && !createRoomDto.isGroup) {
-        // console.log('the new object', originalUserRoom);
         const newObject = {
           ...createRoomDto,
           original_dm_roomID: originalUserRoom.id,
         };
         const newRoom = new this.roomModel(newObject);
-        // console.log('payload from service', newRoom);
+
         return (await newRoom.save()).toJSON();
       }
-
-      // console.log('the new object', originalUserRoom);
+      // group case
       const newRoom = new this.roomModel(createRoomDto);
-      // console.log('payload from service', newRoom);
+
       return (await newRoom.save()).toJSON();
     }
   }
@@ -65,6 +64,14 @@ export class RoomsService {
       throw new NotFoundException('No room with such id');
     }
     return singleRoom;
+  }
+
+  // find one room by id
+  async checkExisting(id: string): Promise<Room> {
+    const singleRoom = await this.roomModel.findOne({ user_id: id }).exec();
+    if (!singleRoom) {
+      return singleRoom;
+    }
   }
   // find room by my_id
   async findByMyId(id: string): Promise<Room[]> {
