@@ -1,8 +1,8 @@
-import { IsString, IsNumber, IsNotEmpty } from 'class-validator';
+import { IsString, IsNumber, IsNotEmpty, IsOptional } from 'class-validator';
 
 export class CreateUnreadMessageDto {
   @IsNumber()
-  @IsNotEmpty()
+  @IsOptional()
   unread_count: number;
 
   @IsString()

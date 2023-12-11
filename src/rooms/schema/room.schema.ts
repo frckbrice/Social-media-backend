@@ -28,6 +28,8 @@ export class Room {
 }
 export const RoomSchema = SchemaFactory.createForClass(Room);
 
+RoomSchema.index({ my_id: 1, user_id: 1 }, { unique: true });
+
 RoomSchema.set('toJSON', {
   transform: (document, returnedObject) => {
     returnedObject.id = returnedObject._id.toString();

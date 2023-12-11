@@ -36,24 +36,27 @@ import mongoose from 'mongoose';
 
 // export const MessageSchema = SchemaFactory.createForClass(Message);
 
-export const MessageSchema = new mongoose.Schema({
-  content: { type: String, required: true },
-  sender_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true,
+export const MessageSchema = new mongoose.Schema(
+  {
+    content: { type: String, required: true },
+    sender_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+    },
+    receiver_room_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Room',
+      required: true,
+    },
+    sender_name: String,
+    sender_phone: String,
+    is_read: { type: Boolean, required: true },
+    reaction: String,
+    // timestamp: { type: Date, default: Date.now() },
   },
-  receiver_room_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Room',
-    required: true,
-  },
-  sender_name: String,
-  sender_phone: String,
-  is_read: { type: Boolean, required: true },
-  reaction: String,
-  timestamp: { type: Date, default: Date.now() },
-});
+  { timestamps: true },
+);
 MessageSchema.index({ sender_id: 1, receiver_room_id: 1 });
 
 MessageSchema.set('toJSON', {
