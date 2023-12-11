@@ -62,8 +62,6 @@ export class MessagesService {
         receiver_room_id,
       );
 
-      // console.log('sent messages', sentMessages);
-
       const receivedMessages = await this.getReceivedMessages(
         sender_id,
         receiver_room_id,
@@ -119,7 +117,7 @@ export class MessagesService {
       return allGroupMessages;
     } catch (error) {
       if (error instanceof Error)
-        console.log('error finding allgroupmessages', error);
+        console.log('error fetching all group messages', error);
       return Promise.reject(error);
     }
   }
