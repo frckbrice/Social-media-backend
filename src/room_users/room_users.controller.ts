@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { RoomUsersService } from './room_users.service';
 import { CreateRoomUserDto } from './dto/create-room_user.dto';
 import { UpdateRoomUserDto } from './dto/update-room_user.dto';
@@ -10,7 +18,7 @@ export class RoomUsersController {
   // Create new room-user
   @Post()
   async create(@Body() createRoomUserDto: CreateRoomUserDto) {
-    console.log('from controller', createRoomUserDto)
+    console.log('from controller', createRoomUserDto);
     return await this.roomUsersService.create(createRoomUserDto);
   }
 
@@ -27,7 +35,10 @@ export class RoomUsersController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateRoomUserDto: UpdateRoomUserDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateRoomUserDto: UpdateRoomUserDto,
+  ) {
     return this.roomUsersService.update(+id, updateRoomUserDto);
   }
 

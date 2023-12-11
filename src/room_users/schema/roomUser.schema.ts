@@ -1,19 +1,17 @@
 import { Prop, SchemaFactory, Schema } from '@nestjs/mongoose';
 import mongoose, { Document, HydratedDocument } from 'mongoose';
 
-export type RoomUserDocument = HydratedDocument<RoomUser>
+export type RoomUserDocument = HydratedDocument<RoomUser>;
 @Schema({ timestamps: true, versionKey: false })
-
 export class RoomUser extends Document {
-
   @Prop({ ref: 'User', required: true })
-  user_id: string
+  user_id: string;
 
   @Prop({ ref: 'Room', required: true })
-  room_id: string
+  room_id: string;
 
   @Prop({ enum: ['member', 'admin'], default: 'member' })
-  role: string
+  role: string;
 
   // @Prop({ type: mongoose.Schema.Types.ObjectId, required: true, ref: 'User' })
   // user_id: mongoose.Schema.Types.ObjectId;

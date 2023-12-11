@@ -6,10 +6,12 @@ import { RoomUser, RoomUserSchema } from './schema/roomUser.schema';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{name: RoomUser.name, schema: RoomUserSchema}])
+    MongooseModule.forFeature([
+      { name: RoomUser.name, schema: RoomUserSchema },
+    ]),
   ],
   controllers: [RoomUsersController],
   providers: [RoomUsersService],
-  exports: [RoomUsersService]
+  exports: [RoomUsersService],
 })
 export class RoomUsersModule {}

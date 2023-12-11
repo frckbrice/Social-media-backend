@@ -12,94 +12,130 @@ import { CreateMessageDto } from './dto/create-message.dto';
 import { Socket, Server } from 'socket.io';
 import { Message } from './interface/messages.interface';
 import { UpdateMessageDto } from './dto/update-message.dto';
+import { Room } from 'src/rooms/interface/room.interface';
+
 // import { CreateRoomDto } from 'src/rooms/dto/create-room.dto';
 
-@WebSocketGateway()
+@WebSocketGateway({ cors: { origin: ['http://localhost:3000', '*'] } })
 export class MessagesGateway
   implements OnGatewayConnection, OnGatewayDisconnect
 {
   constructor(private readonly messagesService: MessagesService) {}
   @WebSocketServer() server: Server;
 
-  handleConnection(client: Socket) {
-    console.log(`client connected: ${client.id}`);
+  private connectedUser: [
+    { user_id: string; status: boolean; last_presence: number },
+  ];
+  private currentUser: string = '';
+  private can_proceed: boolean = false;
+
+  handleConnection(socket: Socket) {
+    console.log(`client connected: ${socket.id}`);
+  }
+  handleDisconnect(socket: Socket): void {
+    console.log(`client disconnected: ${socket.id}`);
   }
 
-  handleDisconnect(client: Socket) {
-    console.log(`client disconnected: ${client.id}`);
-  }
-
-  @SubscribeMessage('joinRoom')
-  handleJoinRoom(
-    @MessageBody() data: { name: string; room: string },
+  @SubscribeMessage('disconnected')
+  async handleDisconnection(
+    @MessageBody() room_id: string,
     @ConnectedSocket() client: Socket,
   ) {
-    console.log('joined the room: ', data);
-    client.join(data.room);
-    //* store user to database
-    this.server
-      .to(data.room)
-      .emit('message', `${data.name} joined the chat room`);
+    // const user = await this.messagesService.getSingleUserGroup(user_id);
+    if (room_id) {
+      this.server
+        .to(room_id.toString())
+        .emit(`user ${room_id} has left the group`);
+      client.leave(room_id.toString());
+    }
 
-    // this.server.emit('message', `welcome to this chat room ${data.room}`);
+    this.can_proceed = true;
+    console.log(`This user has disconnected ${room_id}`);
   }
 
-  @SubscribeMessage('groupMessage')
-  async handleGroupMessage(
-    @MessageBody() data: any,
+  @SubscribeMessage('typing')
+  async handleHeartbeat(
+    @MessageBody() data: { receiver: Room; currentUser: Room },
+  ) {
+    // const userRoom = await this.messagesService.getSingleUserRoom(user_id);
+    this.can_proceed = false;
+    if (data.receiver)
+      this.server
+        .to(data.receiver.original_dm_roomID)
+        .to(data.currentUser.id)
+        .emit('typingResponse', `${data.currentUser.name} is typing`);
+  }
+
+  @SubscribeMessage('connected')
+  handleJoinRoom(
+    @MessageBody() data: { room: string; owner?: string },
     @ConnectedSocket() client: Socket,
-  ): Promise<Message[]> {
-    const groupMessages = await this.messagesService.getGroupMessage(
-      data.receiver_room_id,
-    );
-    console.log('joined the group message chat: ', data);
-    client.join(data.receiver_room_id);
-    this.server.emit('updateMessage', groupMessages);
-    return groupMessages;
+  ) {
+    client.join(data.room);
+    this.can_proceed = false;
+    if (this.currentUser !== data.owner) {
+      this.handleDisconnection(this.currentUser, client);
+      this.currentUser = data.owner;
+    }
+    this.server.to(data?.room).emit('notify', `${data.owner} connected`);
   }
 
   @SubscribeMessage('sendMessage')
   async handleSendMessage(
     @MessageBody() data: CreateMessageDto,
     @ConnectedSocket() client: Socket,
-  ): Promise<Message> {
-    console.log('message sent', data);
-    const message = await this.messagesService.createMessage(data);
+  ) {
+    console.log('message from frontend', data);
+    if (this.currentUser) {
+    }
+    const message = await this.messagesService.createMessage(
+      data,
+      this.currentUser,
+    );
+
+    const allGroups = await this.messagesService.getAllTheGroups();
+    if (allGroups.includes(data.receiver_room_id))
+      return client.broadcast
+        .to(data.receiver_room_id)
+        .emit('message', message);
+
     this.server
-      .to(data.receiver_room_id)
-      .to(data.sender_id)
-      .emit('message', `${data.receiver_room_id}: ${data.content}`);
+      .to(data?.receiver_room_id)
+      .to(data?.sender_id)
+      .emit('message', message);
 
     // this.server.emit('message', `${client.id}: ${data.content}`);
-    return message;
-  }
-
-  @SubscribeMessage('leaveRoom')
-  handleLeaveRoom(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
-    client.leave(data.room);
-    this.server.to(data.room).emit('message', `${data.name} left the room`);
   }
 
   @SubscribeMessage('roomMessages')
-  async getMessages(
-    @MessageBody() data: { [id: string]: string },
-  ): Promise<Message[]> {
-    const roomMessages = await this.messagesService.getMessages(
-      data.sender_room_id,
-      data.receiver_room_id,
-    );
-    this.server.emit('roomMessages', roomMessages);
-    return roomMessages;
+  async getMessages(@MessageBody() data: { [id: string]: string }) {
+    const allGroups = await this.messagesService.getAllTheGroups();
+    if (allGroups.includes(data.receiver_room_id)) {
+      const groupMessages = await this.messagesService.getGroupMessage(
+        data.receiver_room_id,
+      );
+      this.server.to(data?.sender_id).emit('message', groupMessages);
+      return;
+    } else {
+      const roomMessages = await this.messagesService.getb2bMessages(
+        data.sender_id,
+        data.receiver_room_id,
+      );
+      console.log('messages to return', roomMessages);
+      this.server.to(data?.sender_id).emit('message', roomMessages);
+    }
   }
 
   @SubscribeMessage('updateMessage')
   async handleUpdateMessage(
-    @MessageBody() data: UpdateMessageDto & any,
-    // @ConnectedSocket() client: Socket,
+    @MessageBody() data: { [id: string]: string },
+    updateMessageDto: UpdateMessageDto,
+    // @ConnectedSocket() client: Socket
   ): Promise<Message> {
     const updatedMessage = await this.messagesService.updateMessage(
-      data.messageId,
-      data.value,
+      data.sender_id,
+      data.receiver_room_id,
+      updateMessageDto,
     );
     this.server.emit('updateMessage', updatedMessage);
     return updatedMessage;
