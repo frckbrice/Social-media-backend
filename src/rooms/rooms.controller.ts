@@ -11,7 +11,7 @@ import {
 import { RoomsService } from './rooms.service';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { UpdateRoomDto } from './dto/update-room.dto';
-import { Room } from './schema/room.schema';
+import { Room } from './interface/room.interface';
 // import { Query as ExpressQuery } from 'express-serve-static-core';
 
 @Controller('rooms')
