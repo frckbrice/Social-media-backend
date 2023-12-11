@@ -77,21 +77,7 @@ export class MessagesGateway
       this.handleDisconnection(this.currentUser, client);
       this.currentUser = data.owner;
     }
-    this.server.to(data?.room).emit('notify', data.owner);
-  }
-
-  @SubscribeMessage('groupMessage')
-  async handleGroupMessage(
-    @MessageBody() data: any,
-    @ConnectedSocket() client: Socket,
-  ): Promise<Message[]> {
-    const groupMessages = await this.messagesService.getGroupMessage(
-      data.receiver_room_id,
-    );
-    console.log('joined the group message chat: ', data);
-    client.join(data.receiver_room_id);
-    this.server.emit('updateMessage', groupMessages);
-    return groupMessages;
+    this.server.to(data?.room).emit('notify', `${data.owner} connected`);
   }
 
   @SubscribeMessage('sendMessage')
@@ -104,15 +90,14 @@ export class MessagesGateway
     }
     const message = await this.messagesService.createMessage(
       data,
-      this.can_proceed,
+      this.currentUser,
     );
 
     const allGroups = await this.messagesService.getAllTheGroups();
-    if (allGroups.includes(data.receiver_room_id)) {
+    if (allGroups.includes(data.receiver_room_id))
       return client.broadcast
         .to(data.receiver_room_id)
         .emit('message', message);
-    }
 
     this.server
       .to(data?.receiver_room_id)
@@ -122,21 +107,23 @@ export class MessagesGateway
     // this.server.emit('message', `${client.id}: ${data.content}`);
   }
 
-  // @SubscribeMessage('leaveRoom')
-  // handleLeaveRoom(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
-  //   client.leave(data.room);
-  //   this.server.to(data.room).emit('message', `${data.name} left the room`);
-  // }
-
   @SubscribeMessage('roomMessages')
   async getMessages(@MessageBody() data: { [id: string]: string }) {
-    const roomMessages = await this.messagesService.getMessages(
-      data.sender_id,
-      data.receiver_room_id,
-    );
-    this.can_proceed = false;
-    console.log('messages to return', roomMessages);
-    this.server.emit('message', roomMessages);
+    const allGroups = await this.messagesService.getAllTheGroups();
+    if (allGroups.includes(data.receiver_room_id)) {
+      const groupMessages = await this.messagesService.getGroupMessage(
+        data.receiver_room_id,
+      );
+      this.server.to(data?.sender_id).emit('message', groupMessages);
+      return;
+    } else {
+      const roomMessages = await this.messagesService.getb2bMessages(
+        data.sender_id,
+        data.receiver_room_id,
+      );
+      console.log('messages to return', roomMessages);
+      this.server.to(data?.sender_id).emit('message', roomMessages);
+    }
   }
 
   @SubscribeMessage('updateMessage')

@@ -20,7 +20,7 @@ export class MessagesService {
 
   async createMessage(
     createMessageDto: CreateMessageDto,
-    canProceed: boolean,
+    canProceed: string,
   ): Promise<Message> {
     if (
       !createMessageDto.sender_id ||
@@ -33,7 +33,8 @@ export class MessagesService {
     try {
       const createdMessage = await this.messageModel.create(createMessageDto);
       console.log('value of can_proceed: ', canProceed);
-      if (createdMessage && canProceed === true)
+      //activate the counter when the current user is not connected
+      if (createdMessage && canProceed !== createMessageDto.receiver_room_id)
         await this.unreadMessage.createUnreadMessage({
           sender_id: createdMessage.sender_id,
           receiver_room_id: createdMessage.receiver_room_id,
@@ -50,7 +51,7 @@ export class MessagesService {
     return `This action returns all messages`;
   }
 
-  async getMessages(
+  async getb2bMessages(
     sender_id: string,
     receiver_room_id: string,
   ): Promise<Message[]> {
