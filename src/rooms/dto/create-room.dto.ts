@@ -20,4 +20,8 @@ export class CreateRoomDto {
   @IsString()
   @IsOptional()
   my_id: string;
+
+  @IsString()
+  @IsOptional()
+  original_dm_roomID?: string;
 }

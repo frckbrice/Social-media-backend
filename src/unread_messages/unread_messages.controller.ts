@@ -4,7 +4,7 @@ import {
   Post,
   Body,
   Patch,
-  Param,
+  // Param,
   Delete,
 } from '@nestjs/common';
 import { UnreadMessagesService } from './unread_messages.service';
@@ -36,16 +36,21 @@ export class UnreadMessagesController {
     return this.unreadMessagesService.findOneUnreadMessage(data);
   }
 
-  @Patch(':id')
+  @Patch()
   update(
-    @Param('id') id: string,
-    @Body() updateUnreadMessageDto: UpdateUnreadMessageDto,
+    @Body() sender_id: string,
+    receiver_room_id: string,
+    updateUnreadMessageDto: UpdateUnreadMessageDto,
   ) {
-    return this.unreadMessagesService.update(+id, updateUnreadMessageDto);
+    return this.unreadMessagesService.update(
+      sender_id,
+      receiver_room_id,
+      updateUnreadMessageDto,
+    );
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.unreadMessagesService.remove(+id);
+  @Delete()
+  remove(@Body() sender_id: string, receiver_room_id: string) {
+    return this.unreadMessagesService.remove(sender_id, receiver_room_id);
   }
 }

@@ -5,6 +5,6 @@ import { IsString, IsOptional, IsIn } from 'class-validator';
 export class UpdateRoomUserDto extends PartialType(CreateRoomUserDto) {
   @IsString()
   @IsOptional()
-  @IsIn(['user', 'admin'])
+  @IsIn(['member', 'admin'])
   role: string;
 }

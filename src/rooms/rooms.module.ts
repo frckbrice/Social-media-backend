@@ -3,9 +3,11 @@ import { Room, RoomSchema } from './schema/room.schema';
 import { MongooseModule } from '@nestjs/mongoose';
 import { RoomsController } from './rooms.controller';
 import { RoomsService } from './rooms.service';
+import { UnreadMessagesModule } from 'src/unread_messages/unread_messages.module';
 
 @Module({
   imports: [
+    UnreadMessagesModule,
     MongooseModule.forFeature([{ name: Room.name, schema: RoomSchema }]),
   ],
   controllers: [RoomsController],
