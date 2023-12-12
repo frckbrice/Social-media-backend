@@ -32,9 +32,16 @@ export class RoomsService {
 
       return existRoom.toJSON();
     } else {
-      const originalUserRoom = await this.checkExisting(createRoomDto.user_id);
+      // new group
+      if (createRoomDto.isGroup) {
+        const newRoom = new this.roomModel(createRoomDto);
 
-      // not group case
+        return (await newRoom.save()).toJSON();
+      }
+
+      const originalUserRoom = await this.getSingleRoom(createRoomDto.user_id);
+
+      // new dm
       if (originalUserRoom && !createRoomDto.isGroup) {
         const newObject = {
           ...createRoomDto,
@@ -44,7 +51,7 @@ export class RoomsService {
 
         return (await newRoom.save()).toJSON();
       }
-      // group case
+      // new user
       const newRoom = new this.roomModel(createRoomDto);
 
       return (await newRoom.save()).toJSON();
