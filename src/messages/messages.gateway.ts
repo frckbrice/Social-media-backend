@@ -86,23 +86,21 @@ export class MessagesGateway
     @ConnectedSocket() client: Socket,
   ) {
     console.log('message from frontend', data);
-    if (this.currentUser) {
-    }
-    const message = await this.messagesService.createMessage(
-      data,
-      this.currentUser,
-    );
+    // if (this.currentUser) {
+    // }
+    await this.messagesService.createMessage(data, this.currentUser);
 
     const allGroups = await this.messagesService.getAllTheGroups();
     if (allGroups.includes(data.receiver_room_id))
       return client.broadcast
-        .to(data.receiver_room_id)
-        .emit('message', message);
-
-    this.server
-      .to(data?.receiver_room_id)
-      .to(data?.sender_id)
-      .emit('message', message);
+        .to(data?.receiver_room_id)
+        .to(data?.sender_id)
+        .emit('message', data.content);
+    else
+      return this.server
+        .to(data?.receiver_room_id)
+        .to(data?.sender_id)
+        .emit('message', data.content);
 
     // this.server.emit('message', `${client.id}: ${data.content}`);
   }
@@ -114,7 +112,10 @@ export class MessagesGateway
       const groupMessages = await this.messagesService.getGroupMessage(
         data.receiver_room_id,
       );
-      this.server.to(data?.sender_id).emit('message', groupMessages);
+      this.server
+        .to(data?.sender_id)
+        .to(data.receiver_room_id)
+        .emit('message', groupMessages);
       return;
     } else {
       const roomMessages = await this.messagesService.getb2bMessages(
@@ -122,7 +123,10 @@ export class MessagesGateway
         data.receiver_room_id,
       );
       console.log('messages to return', roomMessages);
-      this.server.to(data?.sender_id).emit('message', roomMessages);
+      this.server
+        .to(data?.sender_id)
+        .to(data.receiver_room_id)
+        .emit('message', roomMessages);
     }
   }
 
