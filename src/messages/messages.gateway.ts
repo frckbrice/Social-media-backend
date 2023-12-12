@@ -18,9 +18,8 @@ import { Room } from 'src/rooms/interface/room.interface';
 
 @WebSocketGateway({ cors: { origin: ['http://localhost:3000', '*'] } })
 export class MessagesGateway
-  implements OnGatewayConnection, OnGatewayDisconnect
-{
-  constructor(private readonly messagesService: MessagesService) {}
+  implements OnGatewayConnection, OnGatewayDisconnect {
+  constructor(private readonly messagesService: MessagesService) { }
   @WebSocketServer() server: Server;
 
   private connectedUser: [
@@ -122,7 +121,8 @@ export class MessagesGateway
         data.receiver_room_id,
       );
       console.log('messages to return', roomMessages);
-      this.server.to(data?.sender_id).emit('message', roomMessages);
+      this.server.to(data?.receiver_room_id)
+        .to(data?.sender_id).emit('message', roomMessages);
     }
   }
 
