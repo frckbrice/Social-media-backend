@@ -37,9 +37,12 @@ export class RoomsService {
       // new group
       if (createRoomDto.isGroup) {
         const newRoom = new this.roomModel(createRoomDto);
+
         return (await newRoom.save()).toJSON();
       }
+
       const originalUserRoom = await this.getSingleRoom(createRoomDto.user_id);
+
       // new dm
       if (originalUserRoom && !createRoomDto.isGroup) {
         const newObject = {
