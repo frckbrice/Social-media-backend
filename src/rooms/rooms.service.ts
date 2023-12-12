@@ -24,6 +24,7 @@ export class RoomsService {
   ) {}
   // create new room
   async createRoom(createRoomDto: CreateRoomDto): Promise<Room> {
+   
     const existRoom = await this.roomModel
       .findOne({
         user_id: createRoomDto.user_id,
@@ -35,12 +36,14 @@ export class RoomsService {
       return existRoom.toJSON();
     } else {
       // new group
+      console.log('Payload from roomservice b4 else if', createRoomDto)
       if (createRoomDto.isGroup) {
-        const newRoom = new this.roomModel(createRoomDto);
+        console.log('Payload from roomservice in else if', createRoomDto)
+        const newRoom = await this.roomModel.create(createRoomDto);
 
-        return (await newRoom.save()).toJSON();
+        return newRoom;
       }
-
+      console.log('Payload from roomservice after else if', createRoomDto)
       const originalUserRoom = await this.getSingleRoom(createRoomDto.user_id);
 
       // new dm
@@ -144,27 +147,12 @@ export class RoomsService {
   // find all groups objects in which a user belongs to
   async getAllGroupsOfSingleUser(userId: string): Promise<Room[]> {
     const groupsId = await this.roomUserService.findAllGroupsId(userId)
-    const groups: any[] = []
-    let finalGrps: any[] []
     const allGrps: any[] = groupsId.map(async(group) => {
-      
       const newId = new mongoose.Types.ObjectId(group.room_id)
       const grpArr = await this.roomModel.findOne({ isGroup: true, _id: newId }).exec()
-      // console.log('here is group:', grpArr)
-      // console.log('groups: ', groups)
-      if (grpArr) {
-        groups.push(grpArr)
-        console.log('groups: ', groups)
-      }
-      finalGrps = groups
-      console.log('my groups: ', finalGrps)
-      return groups
+      return grpArr
     })
-    console.log('array of groups', finalGrps)
-    if (typeof allGrps) {
-      console.log('array of groups in if', allGrps)
-      return allGrps
-    }
+    return Promise.all(allGrps)
   }
 
   async getAllGroups() {
@@ -176,18 +164,4 @@ export class RoomsService {
     }
     return [];
   }
-  // search for single room by query
-  // async searchAll(query: Query): Promise<{}> {
-  //   console.log('this is query', query);
-  //   const keyword = query.keyword
-  //     ? {
-  //         name: {
-  //           $regex: query.keyword,
-  //           $options: 'i',
-  //         },
-  //       }
-  //     : {};
-  //   const searchedRoom = await this.roomModel.find({ ...keyword });
-  //   return searchedRoom;
-  // }
 }
