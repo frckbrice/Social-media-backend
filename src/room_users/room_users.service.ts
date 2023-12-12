@@ -4,16 +4,19 @@ import { UpdateRoomUserDto } from './dto/update-room_user.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { RoomUser } from './schema/roomUser.schema';
 import mongoose, { Model } from 'mongoose';
+import { RoomsService } from 'src/rooms/rooms.service';
+import { Room } from 'src/rooms/interface/room.interface';
 
 @Injectable()
 export class RoomUsersService {
   constructor(
     @InjectModel(RoomUser.name) private roomUserModel: Model<RoomUser>,
+    private roomService: RoomsService,
   ) {}
 
   // Post data in the roomUser table
   async create(createRoomUserDto: CreateRoomUserDto): Promise<RoomUser> {
-    console.log('aprameter of fxn from service', createRoomUserDto);
+    console.log('data from service', createRoomUserDto);
     const createRoomUser = new this.roomUserModel(createRoomUserDto);
     console.log('this is roomuser from service', createRoomUser);
     return await createRoomUser.save();
@@ -47,11 +50,24 @@ export class RoomUsersService {
   }
 
   // find one room by id
-  async getGroupOfSingleUser(id: string): Promise<RoomUser> {
-    const singleRoom = await this.roomUserModel.findOne({ user_id: id }).exec();
-    if (!singleRoom) {
+  async getAllGroupMembers(id: string): Promise<string[]> {
+    const groupMembers = await this.roomUserModel.find({ room_id: id }).exec();
+    if (!groupMembers.length) {
       throw new NotFoundException('No room with such id');
     }
-    return singleRoom;
+    console.log('members of the group: ', groupMembers);
+    const membersRoomObjects: Room[] = await Promise.all(
+      groupMembers?.map(async (roomUser) => {
+        return await this.roomService.getSingleRoom(roomUser.user_id);
+      }),
+    );
+    if (!membersRoomObjects.length) {
+      throw new NotFoundException('cannot find members room for this groups');
+    }
+    console.log(
+      'room objects for the members of the groups: ',
+      membersRoomObjects,
+    );
+    return membersRoomObjects?.map((member) => member.id);
   }
 }

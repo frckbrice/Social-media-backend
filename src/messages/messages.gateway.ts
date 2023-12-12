@@ -13,10 +13,23 @@ import { Socket, Server } from 'socket.io';
 import { Message } from './interface/messages.interface';
 import { UpdateMessageDto } from './dto/update-message.dto';
 import { Room } from 'src/rooms/interface/room.interface';
+// import express from 'express';
+// import http from 'node:http';
+
+// const server = http.createServer(express());
+// const io = new Server(server);
 
 // import { CreateRoomDto } from 'src/rooms/dto/create-room.dto';
 
-@WebSocketGateway({ cors: { origin: ['http://localhost:3000', '*'] } })
+@WebSocketGateway({
+  cors: {
+    origin: [
+      'http://localhost:3000',
+      'https://waxchat-backend.onrender.com',
+      '*',
+    ],
+  },
+})
 export class MessagesGateway
   implements OnGatewayConnection, OnGatewayDisconnect
 {
@@ -41,7 +54,6 @@ export class MessagesGateway
     @MessageBody() room_id: string,
     @ConnectedSocket() client: Socket,
   ) {
-    // const user = await this.messagesService.getSingleUserGroup(user_id);
     if (room_id) {
       this.server
         .to(room_id.toString())
@@ -58,10 +70,11 @@ export class MessagesGateway
     @MessageBody() data: { receiver: Room; currentUser: Room },
   ) {
     // const userRoom = await this.messagesService.getSingleUserRoom(user_id);
-    console.log(data);
+    // console.log(data);
     this.can_proceed = false;
     if (data.receiver)
       this.server
+        .to(data.receiver.original_dm_roomID)
         .to(data.currentUser.id)
         .emit('typingResponse', `${data.currentUser.name} is typing`);
   }
@@ -82,30 +95,36 @@ export class MessagesGateway
 
   @SubscribeMessage('sendMessage')
   async handleSendMessage(
-    @MessageBody() data: CreateMessageDto,
+    @MessageBody() data: CreateMessageDto & any,
     @ConnectedSocket() client: Socket,
   ) {
-    console.log('message from frontend', data);
-    // if (this.currentUser) {
-    // }
     const message = await this.messagesService.createMessage(
       data,
       this.currentUser,
     );
 
-    const allGroups = await this.messagesService.getAllTheGroups();
-    if (allGroups.includes(data.receiver_room_id))
-      return client.broadcast
-        .to(data?.receiver_room_id)
-        .to(data?.sender_id)
-        .emit('message', message);
+    // const [groupMembers, allGroups] = await Promise.all([
+    //   await this.messagesService.getGroupMembers(data.receiver_room_id),
+    //   await this.messagesService.getAllTheGroups(),
+    // ]);
+    // console.log('all group members: ', groupMembers);
+    // const tagets = groupMembers?.filter(
+    //   (groupMemberId) => groupMemberId !== data.sender_id,
+    // );
+    // if (allGroups.includes(data.receiver_room_id) && groupMembers.length) {
+    //   for (const userId of groupMembers) {
+    //     console.log('message to distribute: ', message);
+    //     // this.server.to(data.sender_id).to(userId).emit('message', message);
+    //     this.server.to(userId).emit('message', message);
+    //   }
+    //   // this.server.to(data.receiver_room_id).emit('message');
+    //   return;
+    // }
 
     this.server
       .to(data?.receiver_room_id)
       .to(data?.sender_id)
       .emit('message', message);
-
-    // this.server.emit('message', `${client.id}: ${data.content}`);
   }
 
   @SubscribeMessage('roomMessages')
@@ -114,6 +133,11 @@ export class MessagesGateway
     if (allGroups.includes(data.receiver_room_id)) {
       const groupMessages = await this.messagesService.getGroupMessage(
         data.receiver_room_id,
+      );
+      console.log(
+        // 'group messages: ' + groupMessages,
+        'typeof groupMessages',
+        Array.isArray(groupMessages),
       );
       this.server
         .to(data?.sender_id)
@@ -125,7 +149,7 @@ export class MessagesGateway
         data.sender_id,
         data.receiver_room_id,
       );
-      console.log('messages to return', roomMessages);
+      console.log('b2b  messages ', roomMessages);
       this.server
         .to(data?.sender_id)
         .to(data.receiver_room_id)

@@ -1,7 +1,9 @@
 import { IsNotEmpty, IsString, IsIn } from 'class-validator';
 
 export class CreateRoomUserDto {
-  save(): import("src/room_users/schema/roomUser.schema").RoomUser | PromiseLike<import("src/room_users/schema/roomUser.schema").RoomUser> {
+  save():
+    | import('src/room_users/schema/roomUser.schema').RoomUser
+    | PromiseLike<import('src/room_users/schema/roomUser.schema').RoomUser> {
     throw new Error('Method not implemented.');
   }
   @IsString()
@@ -10,7 +12,7 @@ export class CreateRoomUserDto {
 
   @IsString()
   @IsNotEmpty()
-  room_id: string;
+  group_id: string;
 
   @IsString()
   @IsNotEmpty()

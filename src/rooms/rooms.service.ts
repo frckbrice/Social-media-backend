@@ -159,4 +159,15 @@ export class RoomsService {
   //   const searchedRoom = await this.roomModel.find({ ...keyword });
   //   return searchedRoom;
   // }
+
+  //Get all the group for a single user
+  // async getGroupsOfSingleUser(id: string): Promise<Room> {
+  //   const singleRoom = await this.roomModel
+  //     .findOne({ my_id: id, isGroup: true })
+  //     .exec();
+  //   if (!singleRoom) {
+  //     throw new NotFoundException('No room with such id');
+  //   }
+  //   return singleRoom;
+  // }
 }
