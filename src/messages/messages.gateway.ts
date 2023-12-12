@@ -58,10 +58,10 @@ export class MessagesGateway
     @MessageBody() data: { receiver: Room; currentUser: Room },
   ) {
     // const userRoom = await this.messagesService.getSingleUserRoom(user_id);
+    console.log(data);
     this.can_proceed = false;
     if (data.receiver)
       this.server
-        .to(data.receiver.original_dm_roomID)
         .to(data.currentUser.id)
         .emit('typingResponse', `${data.currentUser.name} is typing`);
   }
@@ -88,19 +88,22 @@ export class MessagesGateway
     console.log('message from frontend', data);
     // if (this.currentUser) {
     // }
-    await this.messagesService.createMessage(data, this.currentUser);
+    const message = await this.messagesService.createMessage(
+      data,
+      this.currentUser,
+    );
 
     const allGroups = await this.messagesService.getAllTheGroups();
     if (allGroups.includes(data.receiver_room_id))
       return client.broadcast
         .to(data?.receiver_room_id)
         .to(data?.sender_id)
-        .emit('message', data.content);
-    else
-      return this.server
-        .to(data?.receiver_room_id)
-        .to(data?.sender_id)
-        .emit('message', data.content);
+        .emit('message', message);
+
+    this.server
+      .to(data?.receiver_room_id)
+      .to(data?.sender_id)
+      .emit('message', message);
 
     // this.server.emit('message', `${client.id}: ${data.content}`);
   }

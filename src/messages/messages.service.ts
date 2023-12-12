@@ -40,6 +40,7 @@ export class MessagesService {
           receiver_room_id: createdMessage.receiver_room_id,
           last_message: createdMessage.content,
         });
+
       return createdMessage;
     } catch (error) {
       if (error instanceof Error) console.log('error creating messages', error);
