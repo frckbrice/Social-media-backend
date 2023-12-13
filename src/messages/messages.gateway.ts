@@ -55,7 +55,9 @@ export class MessagesGateway
     @ConnectedSocket() client: Socket,
   ) {
     if (room_id) {
-      this.server.to(room_id.toString()).emit(`user ${room_id} disconnected`);
+      this.server
+        .to(room_id.toString())
+        .emit('disconnected', `🔥: user ${room_id} disconnected`);
       client.leave(room_id.toString());
     }
 
@@ -64,17 +66,15 @@ export class MessagesGateway
   }
 
   @SubscribeMessage('typing')
-  async handleHeartbeat(
-    @MessageBody() data: { receiver: Room; currentUser: Room },
-  ) {
-    // const userRoom = await this.messagesService.getSingleUserRoom(user_id);
+  async handleHeartbeat(@MessageBody() data: { room: string; owner?: string }) {
+    const user = await this.messagesService.getOneUserRoom(data.owner);
     // console.log(data);
     this.can_proceed = false;
-    if (data.receiver)
-      this.server
-        .to(data.receiver.original_dm_roomID)
-        // .to(data.currentUser.id)
-        .emit('typingResponse', `${data.currentUser.name} is typing`);
+
+    this.server
+      .to(data.room)
+      // .to(data.currentUser.id)
+      .emit('typingResponse', `${user.name} is typing`);
   }
 
   @SubscribeMessage('connected')
@@ -89,7 +89,7 @@ export class MessagesGateway
       this.currentUser = data.owner;
     }
     const user = await this.messagesService.getOneUserRoom(data.owner);
-    this.server.to(data?.room).emit('notify', `${user.name} 🟢 online `);
+    this.server.to(data?.room).emit('notify', `🟢 ${user?.name} online `);
   }
 
   @SubscribeMessage('sendMessage')

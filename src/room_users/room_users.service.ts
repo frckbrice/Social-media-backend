@@ -92,8 +92,19 @@ export class RoomUsersService {
     const membersRoomObjects: Room[] = await Promise.all(
       groupMembers?.map(async (roomUser) => {
         const object = await this.roomService.getSingleRoom(roomUser.user_id);
-        object['role'] = roomUser.role;
-        return object;
+
+        return {
+          name: object.name,
+          image: object.image,
+          isGroup: object.isGroup,
+          user_id: object.user_id,
+          my_id: object.my_id,
+          createdAt: object.createdAt,
+          updatedAt: object.updatedAt,
+          id: object.id,
+          role: roomUser.role,
+          original_dm_roomID: object.original_dm_roomID,
+        };
       }),
     );
     if (!membersRoomObjects.length) {
@@ -172,6 +183,7 @@ export class RoomUsersService {
               last_message: item?.last_message,
             };
         })
+        .sort((a, b) => (a.createdAt > b.createdAt ? 1 : -1))
         ?.filter((item) => item.name);
       // .reduce((acc, item) => {
       //   if (!acc.find((curr) => curr.id === item.id)) acc.push(item);

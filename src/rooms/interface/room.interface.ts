@@ -10,4 +10,5 @@ export interface Room {
   original_dm_roomID: string;
   unread_count?: number;
   last_message?: string;
+  role?: string;
 }
