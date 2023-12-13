@@ -53,4 +53,10 @@ export class RoomUsersController {
     return this.roomUsersService.getAllGroupAndDM(id);
     // return this.roomsService.getAllGroupAndDM(id);
   }
+
+  // GET ALL PARTICIPANTS IN A GROUPS
+  @Get('/all_participants/:id')
+  async getGroupmemebers(@Param('id') id: string) {
+    return (await this.roomUsersService.getAllGroupMembers(id))[1];
+  }
 }

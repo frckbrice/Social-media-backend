@@ -83,7 +83,7 @@ export class RoomUsersService {
   }
 
   // find one room by id
-  async getAllGroupMembers(id: string): Promise<string[]> {
+  async getAllGroupMembers(id: string) {
     const groupMembers = await this.roomUserModel.find({ room_id: id }).exec();
     if (!groupMembers.length) {
       throw new NotFoundException('No room with such id');
@@ -98,7 +98,7 @@ export class RoomUsersService {
       throw new NotFoundException('cannot find members room for this groups');
     }
 
-    return membersRoomObjects?.map((member) => member.id);
+    return [membersRoomObjects?.map((member) => member.id), membersRoomObjects];
   }
 
   async getAllGroupAndDM(userId: string) {
@@ -109,6 +109,11 @@ export class RoomUsersService {
         await this.findAllGroupsOfASingleUser(userId),
         await this.roomService.fetchAllRooms(userId),
       ]);
+
+    console.log('unread messages:', allUnreadMessages);
+    console.log('myRoom:', myRoom);
+    console.log('allGroupOfAMember:', allGroupOfAMember);
+    console.log('allRooms:', allRooms);
 
     if (allUnreadMessages && myRoom) {
       return allUnreadMessages
@@ -149,6 +154,7 @@ export class RoomUsersService {
               my_id: item?._doc.my_id,
               createdAt: item?._doc.createdAt,
               updatedAt: item?._doc.createdAt,
+              original_dm_roomID: item?._doc.original_dm_roomID,
               id: item?._doc.id,
               unread_count: 0,
               last_message: '',
@@ -162,16 +168,17 @@ export class RoomUsersService {
               my_id: item?.my_id,
               createdAt: item?.createdAt,
               updatedAt: item?.updatedAt,
+              original_dm_roomID: item?.original_dm_roomID,
               id: item?.id,
               unread_count: item?.unread_count,
               last_message: item?.last_message,
             };
         })
-        ?.filter((item) => item.name)
-        .reduce((acc, item) => {
-          if (!acc.find((curr) => curr.id === item.id)) acc.push(item);
-          return acc;
-        }, []);
+        ?.filter((item) => item.name);
+      // .reduce((acc, item) => {
+      //   if (!acc.find((curr) => curr.id === item.id)) acc.push(item);
+      //   return acc;
+      // }, []);
     }
   }
 
