@@ -155,7 +155,7 @@ export class RoomUsersService {
               createdAt: item?._doc.createdAt,
               updatedAt: item?._doc.createdAt,
               original_dm_roomID: item?._doc.original_dm_roomID,
-              id: item?._doc.id,
+              id: item?._doc._id,
               unread_count: 0,
               last_message: '',
             };

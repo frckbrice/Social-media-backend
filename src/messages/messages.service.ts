@@ -102,6 +102,7 @@ export class MessagesService {
         else if (typeof updateMessageDto === 'string')
           updatedMessage.reaction = updateMessageDto;
 
+        await this.unreadMessage.remove(sender_id, receiver_room_id);
         return await updatedMessage.save();
       }
     } catch (error) {
