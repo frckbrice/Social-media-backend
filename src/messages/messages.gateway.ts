@@ -116,7 +116,7 @@ export class MessagesGateway
         // this.server.to(data.sender_id).to(userId).emit('message', message);
         // this.server.to(userId).emit('message', message);
       }
-      this.server.to(data.receiver_room_id).emit('message');
+      this.server.to(data.receiver_room_id).emit('message', message);
       return;
     }
 

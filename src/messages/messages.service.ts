@@ -102,6 +102,7 @@ export class MessagesService {
         else if (typeof updateMessageDto === 'string')
           updatedMessage.reaction = updateMessageDto;
 
+        await this.unreadMessage.remove(sender_id, receiver_room_id);
         return await updatedMessage.save();
       }
     } catch (error) {
@@ -114,7 +115,7 @@ export class MessagesService {
     try {
       const allGroupMessages = await this.messageModel
         .find({ receiver_room_id: groupId })
-        .sort('timestamp')
+        .sort('createAt DESC')
         .exec();
       if (allGroupMessages) return allGroupMessages;
       else
