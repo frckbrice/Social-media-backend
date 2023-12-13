@@ -184,6 +184,10 @@ export class MessagesService {
     return await this.roomService.getSingleRoom(user_id);
   }
 
+  async getOneUserRoom(user_id: string) {
+    return await this.roomService.fetchOneRoom(user_id);
+  }
+
   shuffleMessages(array: any[]) {
     if (array.length <= 1) return array;
     for (let i = array.length - 1; i >= 0; i--) {

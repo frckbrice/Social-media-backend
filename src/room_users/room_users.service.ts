@@ -77,7 +77,6 @@ export class RoomUsersService {
 
   // remove a group participant
   async removeParticipant(id: string) {
-    
     return await this.roomUserModel.findOneAndDelete({
       user_id: id,
     });
@@ -92,7 +91,8 @@ export class RoomUsersService {
     // console.log('members of the group: ', groupMembers);
     const membersRoomObjects: Room[] = await Promise.all(
       groupMembers?.map(async (roomUser) => {
-        return await this.roomService.getSingleRoom(roomUser.user_id);
+        const object = await this.roomService.getSingleRoom(roomUser.user_id);
+        return { ...object, role: roomUser.role };
       }),
     );
     if (!membersRoomObjects.length) {
@@ -111,11 +111,6 @@ export class RoomUsersService {
         await this.roomService.fetchAllRooms(userId),
       ]);
 
-    console.log('unread messages:', allUnreadMessages);
-    console.log('myRoom:', myRoom);
-    console.log('allGroupOfAMember:', allGroupOfAMember);
-    console.log('allRooms:', allRooms);
-
     if (allUnreadMessages && myRoom) {
       return allUnreadMessages
         ?.reduce(
@@ -127,7 +122,8 @@ export class RoomUsersService {
                   curr?.receiver_room_id.toString() === myRoom.id.toString()) ||
                 (item?.isGroup &&
                   curr.receiver_room_id.toString() === item.id.toString())
-              ) {3
+              ) {
+                3;
                 return {
                   ...item,
                   unread_count: curr?.unread_count,

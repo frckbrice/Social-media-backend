@@ -31,8 +31,9 @@ import { Room } from 'src/rooms/interface/room.interface';
   },
 })
 export class MessagesGateway
-  implements OnGatewayConnection, OnGatewayDisconnect {
-  constructor(private readonly messagesService: MessagesService) { }
+  implements OnGatewayConnection, OnGatewayDisconnect
+{
+  constructor(private readonly messagesService: MessagesService) {}
   @WebSocketServer() server: Server;
 
   private connectedUser: [
@@ -54,9 +55,7 @@ export class MessagesGateway
     @ConnectedSocket() client: Socket,
   ) {
     if (room_id) {
-      this.server
-        .to(room_id.toString())
-        .emit(`user ${room_id} has left the group`);
+      this.server.to(room_id.toString()).emit(`user ${room_id} disconnected`);
       client.leave(room_id.toString());
     }
 
@@ -79,7 +78,7 @@ export class MessagesGateway
   }
 
   @SubscribeMessage('connected')
-  handleJoinRoom(
+  async handleJoinRoom(
     @MessageBody() data: { room: string; owner?: string },
     @ConnectedSocket() client: Socket,
   ) {
@@ -89,7 +88,8 @@ export class MessagesGateway
       this.handleDisconnection(this.currentUser, client);
       this.currentUser = data.owner;
     }
-    this.server.to(data?.room).emit('notify', `${data.owner} connected`);
+    const user = await this.messagesService.getOneUserRoom(data.owner);
+    this.server.to(data?.room).emit('notify', `${user.name} 🟢 online `);
   }
 
   @SubscribeMessage('sendMessage')
@@ -111,11 +111,11 @@ export class MessagesGateway
       (groupMemberId) => groupMemberId !== data.sender_id,
     );
     if (allGroups.includes(data.receiver_room_id) && groupMembers.length) {
-      for (const userId of tagets) {
-        console.log('message to distribute: ', message);
-        // this.server.to(data.sender_id).to(userId).emit('message', message);
-        // this.server.to(userId).emit('message', message);
-      }
+      // for (const userId of tagets) {
+      //   console.log('message to distribute: ', message);
+      //   this.server.to(data.sender_id).to(userId).emit('message', message);
+      //   this.server.to(userId).emit('message', message);
+      // }
       this.server.to(data.receiver_room_id).emit('message', message);
       return;
     }
