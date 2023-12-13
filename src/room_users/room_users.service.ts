@@ -111,6 +111,11 @@ export class RoomUsersService {
         await this.roomService.fetchAllRooms(userId),
       ]);
 
+    console.log('unread messages:', allUnreadMessages);
+    console.log('myRoom:', myRoom);
+    console.log('allGroupOfAMember:', allGroupOfAMember);
+    console.log('allRooms:', allRooms);
+
     if (allUnreadMessages && myRoom) {
       return allUnreadMessages
         ?.reduce(
@@ -150,8 +155,8 @@ export class RoomUsersService {
               my_id: item?._doc.my_id,
               createdAt: item?._doc.createdAt,
               updatedAt: item?._doc.createdAt,
-              id: item?._doc.id,
               original_dm_roomID: item?._doc.original_dm_roomID,
+              id: item?._doc.id,
               unread_count: 0,
               last_message: '',
             };
@@ -164,13 +169,17 @@ export class RoomUsersService {
               my_id: item?.my_id,
               createdAt: item?.createdAt,
               updatedAt: item?.updatedAt,
-              id: item?.id,
               original_dm_roomID: item?.original_dm_roomID,
+              id: item?.id,
               unread_count: item?.unread_count,
               last_message: item?.last_message,
             };
         })
-        ?.filter((item) => item.name)
+        ?.filter((item) => item.name);
+      // .reduce((acc, item) => {
+      //   if (!acc.find((curr) => curr.id === item.id)) acc.push(item);
+      //   return acc;
+      // }, []);
     }
   }
 

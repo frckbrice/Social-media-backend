@@ -20,13 +20,7 @@ export class RoomUsersController {
   async create(@Body() createRoomUserDto: CreateRoomUserDto) {
     console.log('from controller', createRoomUserDto);
     return await this.roomUsersService.create(createRoomUserDto);
-  }
-
-  // GET ALL PARTICIPANTS IN A GROUPS
-  @Get('/all_participants/:id')
-  async getGroupmemebers(@Param('id') id: string) {
-    return (await this.roomUsersService.getAllGroupMembers(id))[1]
-  }  
+  } 
 
   // get all rooms-users
   @Get()
@@ -59,5 +53,11 @@ export class RoomUsersController {
   findOneByMyId(@Param('id') id: string) {
     return this.roomUsersService.getAllGroupAndDM(id);
     // return this.roomsService.getAllGroupAndDM(id);
+  }
+
+  // GET ALL PARTICIPANTS IN A GROUPS
+  @Get('/all_participants/:id')
+  async getGroupmemebers(@Param('id') id: string) {
+    return (await this.roomUsersService.getAllGroupMembers(id))[1];
   }
 }

@@ -111,12 +111,12 @@ export class MessagesGateway
       (groupMemberId) => groupMemberId !== data.sender_id,
     );
     if (allGroups.includes(data.receiver_room_id) && groupMembers.length) {
-      // for (const userId of tagets) {
-      //   console.log('message to distribute: ', message);
-      //   this.server.to(data.sender_id).to(userId).emit('message', message);
-      //   this.server.to(userId).emit('message', message);
-      // }
-      this.server.to(data.receiver_room_id).emit('message', message);
+      for (const userId of tagets) {
+        console.log('message to distribute: ', message);
+        // this.server.to(data.sender_id).to(userId).emit('message', message);
+        // this.server.to(userId).emit('message', message);
+      }
+      this.server.to(data.receiver_room_id).emit('message');
       return;
     }
 
