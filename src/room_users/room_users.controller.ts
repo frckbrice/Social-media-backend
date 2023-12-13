@@ -23,10 +23,10 @@ export class RoomUsersController {
   }
 
   // GET ALL PARTICIPANTS IN A GROUPS
-  // @Get('/all_participants')
-  // async getGroupmemebers() {
-  //   return await this.roomUsersService.
-  // }  
+  @Get('/all_participants/:id')
+  async getGroupmemebers(@Param('id') id: string) {
+    return (await this.roomUsersService.getAllGroupMembers(id))[1]
+  }  
 
   // get all rooms-users
   @Get()

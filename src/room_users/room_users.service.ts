@@ -84,7 +84,7 @@ export class RoomUsersService {
   }
 
   // find one room by id
-  async getAllGroupMembers(id: string): Promise<string[]> {
+  async getAllGroupMembers(id: string) {
     const groupMembers = await this.roomUserModel.find({ room_id: id }).exec();
     if (!groupMembers.length) {
       throw new NotFoundException('No room with such id');
@@ -99,7 +99,7 @@ export class RoomUsersService {
       throw new NotFoundException('cannot find members room for this groups');
     }
 
-    return membersRoomObjects?.map((member) => member.id);
+    return [membersRoomObjects?.map((member) => member.id), membersRoomObjects];
   }
 
   async getAllGroupAndDM(userId: string) {
