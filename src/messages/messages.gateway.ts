@@ -133,6 +133,7 @@ export class MessagesGateway
     if (allGroups.includes(data.receiver_room_id)) {
       const groupMessages = await this.messagesService.getGroupMessage(
         data.receiver_room_id,
+        data.sender_id,
       );
       console.log(
         // 'group messages: ' + groupMessages,

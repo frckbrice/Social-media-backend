@@ -58,6 +58,7 @@ export class MessagesService {
     receiver_room_id: string,
   ): Promise<Message[]> {
     console.log('inside get message function', sender_id, receiver_room_id);
+    await this.unreadMessage.remove(sender_id, receiver_room_id);
     try {
       const sentMessages = await this.getSentMessages(
         sender_id,
@@ -69,7 +70,7 @@ export class MessagesService {
         receiver_room_id,
       );
       //reset unread messages to initial state
-      await this.unreadMessage.remove(sender_id, receiver_room_id);
+      // await this.unreadMessage.remove(sender_id, receiver_room_id);
 
       await this.updateMessage(sender_id, receiver_room_id, {
         is_read: true,
@@ -78,6 +79,7 @@ export class MessagesService {
 
       const messages = [...sentMessages, ...receivedMessages];
       // console.log('all messages', messages);
+
       return this.shuffleMessages(messages);
     } catch (error) {
       if (error instanceof Error) console.log('error getting messages', error);
@@ -102,7 +104,6 @@ export class MessagesService {
         else if (typeof updateMessageDto === 'string')
           updatedMessage.reaction = updateMessageDto;
 
-        await this.unreadMessage.remove(sender_id, receiver_room_id);
         return await updatedMessage.save();
       }
     } catch (error) {
@@ -111,11 +112,12 @@ export class MessagesService {
     }
   }
 
-  async getGroupMessage(groupId: string): Promise<Message[]> {
+  async getGroupMessage(groupId: string, senderId: string): Promise<Message[]> {
     try {
+      await this.unreadMessage.remove(senderId, groupId);
       const allGroupMessages = await this.messageModel
         .find({ receiver_room_id: groupId })
-        .sort('timestamp')
+        .sort('createdAt DESC')
         .exec();
       if (allGroupMessages) return allGroupMessages;
       else

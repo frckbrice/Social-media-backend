@@ -74,6 +74,7 @@ export class UnreadMessagesService {
   }
 
   async remove(sender_id: string, receiver_room_id: string) {
+    console.log('inside unread message remove');
     const value = await this.unreadMessage.findOne({
       sender_id: sender_id,
       receiver_room_id: receiver_room_id,
