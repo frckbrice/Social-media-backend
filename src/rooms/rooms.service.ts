@@ -23,7 +23,6 @@ export class RoomsService {
   ) {}
   // create new room
   async createRoom(createRoomDto: CreateRoomDto): Promise<Room> {
-   
     const existRoom = await this.roomModel
       .findOne({
         user_id: createRoomDto.user_id,
@@ -35,14 +34,14 @@ export class RoomsService {
       return existRoom.toJSON();
     } else {
       // new group
-      console.log('Payload from roomservice b4 else if', createRoomDto)
+      console.log('Payload from roomservice b4 else if', createRoomDto);
       if (createRoomDto.isGroup) {
-        console.log('Payload from roomservice in else if', createRoomDto)
+        console.log('Payload from roomservice in else if', createRoomDto);
         const newRoom = await this.roomModel.create(createRoomDto);
 
         return newRoom;
       }
-      console.log('Payload from roomservice after else if', createRoomDto)
+      console.log('Payload from roomservice after else if', createRoomDto);
       const originalUserRoom = await this.getSingleRoom(createRoomDto.user_id);
 
       // new dm
@@ -163,9 +162,13 @@ export class RoomsService {
 
   //Get a single user
   async fetchOneRoom(id: string): Promise<Room> {
-    // console.log('inside fetchOneRoom: ', id);
-    const singleRoom = await this.roomModel.findById(id).exec();
-    // console.log(singleRoom);
-    if (singleRoom) return singleRoom.toJSON();
+    console.log('inside fetchOneRoom: ', id);
+    if (id) {
+      const singleRoom = await this.roomModel
+        .findById(new mongoose.Types.ObjectId(id))
+        .exec();
+      // console.log(singleRoom);
+      if (singleRoom) return singleRoom.toJSON();
+    } else return null;
   }
 }

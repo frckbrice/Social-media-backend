@@ -92,7 +92,8 @@ export class RoomUsersService {
     const membersRoomObjects: Room[] = await Promise.all(
       groupMembers?.map(async (roomUser) => {
         const object = await this.roomService.getSingleRoom(roomUser.user_id);
-        return { ...object, role: roomUser.role };
+        object['role'] = roomUser.role;
+        return object;
       }),
     );
     if (!membersRoomObjects.length) {

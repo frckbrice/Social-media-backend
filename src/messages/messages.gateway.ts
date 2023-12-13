@@ -73,7 +73,7 @@ export class MessagesGateway
     if (data.receiver)
       this.server
         .to(data.receiver.original_dm_roomID)
-        .to(data.currentUser.id)
+        // .to(data.currentUser.id)
         .emit('typingResponse', `${data.currentUser.name} is typing`);
   }
 
