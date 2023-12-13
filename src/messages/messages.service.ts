@@ -115,7 +115,7 @@ export class MessagesService {
     try {
       const allGroupMessages = await this.messageModel
         .find({ receiver_room_id: groupId })
-        .sort('timestamp')
+        .sort('createAt DESC')
         .exec();
       if (allGroupMessages) return allGroupMessages;
       else

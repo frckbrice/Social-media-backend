@@ -20,7 +20,7 @@ export class RoomUsersController {
   async create(@Body() createRoomUserDto: CreateRoomUserDto) {
     console.log('from controller', createRoomUserDto);
     return await this.roomUsersService.create(createRoomUserDto);
-  }
+  } 
 
   // get all rooms-users
   @Get()
@@ -42,6 +42,7 @@ export class RoomUsersController {
     return this.roomUsersService.update(+id, updateRoomUserDto);
   }
 
+  // remove a group participant
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.roomUsersService.removeParticipant(id);

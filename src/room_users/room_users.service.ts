@@ -77,6 +77,7 @@ export class RoomUsersService {
 
   // remove a group participant
   async removeParticipant(id: string) {
+    
     return await this.roomUserModel.findOneAndDelete({
       user_id: id,
     });
@@ -126,7 +127,7 @@ export class RoomUsersService {
                   curr?.receiver_room_id.toString() === myRoom.id.toString()) ||
                 (item?.isGroup &&
                   curr.receiver_room_id.toString() === item.id.toString())
-              ) {
+              ) {3
                 return {
                   ...item,
                   unread_count: curr?.unread_count,

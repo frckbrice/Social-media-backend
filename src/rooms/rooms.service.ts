@@ -21,9 +21,9 @@ export class RoomsService {
     private unreadMessages: UnreadMessagesService,
     // private roomUserService: RoomUsersService,
   ) {}
-
   // create new room
   async createRoom(createRoomDto: CreateRoomDto): Promise<Room> {
+   
     const existRoom = await this.roomModel
       .findOne({
         user_id: createRoomDto.user_id,
@@ -32,16 +32,17 @@ export class RoomsService {
       .exec();
     if (existRoom) {
       console.log('room already exist', existRoom.toJSON());
-
       return existRoom.toJSON();
     } else {
       // new group
+      console.log('Payload from roomservice b4 else if', createRoomDto)
       if (createRoomDto.isGroup) {
-        const newRoom = new this.roomModel(createRoomDto);
+        console.log('Payload from roomservice in else if', createRoomDto)
+        const newRoom = await this.roomModel.create(createRoomDto);
 
-        return (await newRoom.save()).toJSON();
+        return newRoom;
       }
-
+      console.log('Payload from roomservice after else if', createRoomDto)
       const originalUserRoom = await this.getSingleRoom(createRoomDto.user_id);
 
       // new dm
@@ -51,12 +52,10 @@ export class RoomsService {
           original_dm_roomID: originalUserRoom.id,
         };
         const newRoom = new this.roomModel(newObject);
-
         return (await newRoom.save()).toJSON();
       }
       // new user
       const newRoom = new this.roomModel(createRoomDto);
-
       return (await newRoom.save()).toJSON();
     }
   }
@@ -161,21 +160,6 @@ export class RoomsService {
     }
     return [];
   }
-
-  // search for single room by query
-  // async searchAll(query: Query): Promise<{}> {
-  //   console.log('this is query', query);
-  //   const keyword = query.keyword
-  //     ? {
-  //         name: {
-  //           $regex: query.keyword,
-  //           $options: 'i',
-  //         },
-  //       }
-  //     : {};
-  //   const searchedRoom = await this.roomModel.find({ ...keyword });
-  //   return searchedRoom;
-  // }
 
   //Get a single user
   async fetchOneRoom(id: string): Promise<Room> {
