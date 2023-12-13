@@ -1,5 +1,4 @@
 import {
-  HttpCode,
   HttpException,
   HttpStatus,
   Injectable,
@@ -173,8 +172,6 @@ export class RoomUsersService {
           if (!acc.find((curr) => curr.id === item.id)) acc.push(item);
           return acc;
         }, []);
-
-      // .filter((item) => !item.$__);
     }
   }
 
