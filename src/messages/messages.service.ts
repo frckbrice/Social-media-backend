@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { UpdateMessageDto } from './dto/update-message.dto';
 // import { Message } from './schema/message.schema';
@@ -27,8 +27,9 @@ export class MessagesService {
       !createMessageDto.receiver_room_id ||
       !createMessageDto.content
     )
-      return Promise.reject(
+      throw new HttpException(
         ' Need sender , receiver and content to send the message',
+        HttpStatus.BAD_REQUEST,
       );
     try {
       const createdMessage = await this.messageModel.create(createMessageDto);
@@ -115,11 +116,16 @@ export class MessagesService {
         .find({ receiver_room_id: groupId })
         .sort('timestamp')
         .exec();
-      return allGroupMessages;
+      if (allGroupMessages) return allGroupMessages;
+      else
+        throw new HttpException('No such group messages', HttpStatus.NOT_FOUND);
     } catch (error) {
       if (error instanceof Error)
         console.log('error fetching all group messages', error);
-      return Promise.reject(error);
+      throw new HttpException(
+        'Error fetching all group messages',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -163,8 +169,8 @@ export class MessagesService {
     console.log('no received messages between the two users');
   }
 
-  async getSingleUserGroup(user_id: string) {
-    return await this.roomUserService.getGroupOfSingleUser(user_id);
+  async getGroupMembers(my_id: string) {
+    return await this.roomUserService.getAllGroupMembers(my_id);
   }
 
   async getAllTheGroups() {
@@ -175,7 +181,7 @@ export class MessagesService {
     return await this.roomService.getSingleRoom(user_id);
   }
 
-  shuffleMessages(array: Message[]) {
+  shuffleMessages(array: any[]) {
     if (array.length <= 1) return array;
     for (let i = array.length - 1; i >= 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
