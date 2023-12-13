@@ -10,7 +10,6 @@ import { UnreadMessagesModule } from 'src/unread_messages/unread_messages.module
   imports: [
     UnreadMessagesModule,
     MongooseModule.forFeature([{ name: Room.name, schema: RoomSchema }]),
-    RoomUsersModule
   ],
   controllers: [RoomsController],
   providers: [RoomsService],

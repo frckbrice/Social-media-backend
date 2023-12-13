@@ -41,26 +41,27 @@ export class RoomsController {
   @Get('/my_dm/:id')
   findOneByMyId(@Param('id') id: string) {
     return this.roomsService.findByMyId(id);
+    // return this.roomsService.getAllGroupAndDM(id);
   }
 
   // update single room
   @Put(':id')
   update(@Param('id') id: string, @Body() updateRoomDto: UpdateRoomDto) {
-    console.log('from controller', updateRoomDto)
+    console.log('from controller', updateRoomDto);
     return this.roomsService.updateRoom(id, updateRoomDto);
   }
 
   // delete single room
   @Delete(':id/:myId')
   async remove(@Param('id') id: string, @Param('myId') myId: string) {
-    console.log('from roomcontroller', id)
+    console.log('from roomcontroller', id);
     return await this.roomsService.deleteRoom(id, myId);
   }
 
   // get all groups of one user
   @Get('/all_groups/:id')
   async getAllgroups(@Param('id') id: string) {
-    return await this.roomsService.getAllGroupsOfSingleUser(id)
+    return await this.roomsService.getAllGroupsOfSingleUser(id);
   }
 
   // find single room by name using query params

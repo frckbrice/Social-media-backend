@@ -6,21 +6,20 @@ import {
 } from '@nestjs/common';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { UpdateRoomDto } from './dto/update-room.dto';
-import mongoose, { Model } from 'mongoose';
 // import { Room } from './schema/room.schema';
 import { Room } from './interface/room.interface';
-// import { Model } from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { RoomUsersService } from 'src/room_users/room_users.service';
 // import { Query } from 'express-serve-static-core';
 import { UnreadMessagesService } from 'src/unread_messages/unread_messages.service';
+// import { RoomUsersService } from 'src/room_users/room_users.service';
 
 @Injectable()
 export class RoomsService {
   constructor(
     @InjectModel('Room') private roomModel: Model<Room>,
     private unreadMessages: UnreadMessagesService,
-    private roomUserService: RoomUsersService,
+    // private roomUserService: RoomUsersService,
   ) {}
   // create new room
   async createRoom(createRoomDto: CreateRoomDto): Promise<Room> {
@@ -77,30 +76,21 @@ export class RoomsService {
     return singleRoom;
   }
 
-  // find one room by id
-  async checkExisting(id: string): Promise<Room> {
-    const singleRoom = await this.roomModel.findOne({ user_id: id }).exec();
-    if (!singleRoom) {
-      return singleRoom;
-    }
-  }
   // find room by my_id
   async findByMyId(id: string): Promise<Room[]> {
     try {
-      const allRooms = await this.roomModel.find({ my_id: id }).exec();
-      console.log('these are all rooms', allRooms);
-
-      const [allUnreadMessages, myRoomID] = await Promise.all([
+      const [allUnreadMessages, myRoomID, allRooms] = await Promise.all([
         await this.unreadMessages.findAll(),
         await this.getSingleRoom(id),
+        await this.roomModel.find({ my_id: id }).exec(),
       ]);
 
       if (allUnreadMessages && myRoomID) {
-        const listToReturn = allUnreadMessages?.reduce(
+        return allUnreadMessages?.reduce(
           (acc, curr) => {
             acc = acc?.map((item: any) =>
               item.original_dm_roomID === curr.sender_id.toString() &&
-              curr?.receiver_room_id.toString() === myRoomID.toString()
+              curr?.receiver_room_id.toString() === myRoomID.id.toString()
                 ? {
                     ...item,
                     unread_count: curr?.unread_count,
@@ -113,8 +103,6 @@ export class RoomsService {
           },
           [...allRooms],
         );
-
-        return listToReturn;
       }
     } catch (error) {
       if (error instanceof Error)
@@ -128,9 +116,14 @@ export class RoomsService {
         );
     }
   }
+
+  async fetchAllRooms(id: string) {
+    return await this.roomModel.find({ my_id: id }).exec();
+  }
+
   // find One room by id and update
   async updateRoom(id: string, update: UpdateRoomDto): Promise<Room> {
-    console.log('update from roomService', update)
+    console.log('update from roomService', update);
     return await this.roomModel.findByIdAndUpdate(id, update, {
       new: true,
       runValidators: true,
@@ -138,21 +131,24 @@ export class RoomsService {
   }
   // delete room
   async deleteRoom(id: string, myId: string) {
-    const newId = new mongoose.Types.ObjectId(id)
-    console.log('id from roomservice', newId)
-    console.log('myId from roomservice', myId)
+    const newId = new mongoose.Types.ObjectId(id);
+    console.log('id from roomservice', newId);
+    console.log('myId from roomservice', myId);
     return await this.roomModel.findOneAndDelete({ _id: newId, my_id: myId });
   }
 
   // find all groups objects in which a user belongs to
-  async getAllGroupsOfSingleUser(userId: string): Promise<Room[]> {
-    const groupsId = await this.roomUserService.findAllGroupsId(userId)
-    const allGrps: any[] = groupsId.map(async(group) => {
-      const newId = new mongoose.Types.ObjectId(group.room_id)
-      const grpArr = await this.roomModel.findOne({ isGroup: true, _id: newId }).exec()
-      return grpArr
-    })
-    return Promise.all(allGrps)
+
+  async getAllGroupsOfSingleUser(userId: string) {
+    // const groupsId = await this.roomUserService.findAllGroupsId(userId);
+    // const allGrps: any[] = groupsId.map(async (group) => {
+    //   const newId = new mongoose.Types.ObjectId(group.room_id);
+    //   const grpArr = await this.roomModel
+    //     .findOne({ isGroup: true, _id: newId })
+    //     .exec();
+    //   return grpArr;
+    // });
+    // return Promise.all(allGrps);
   }
 
   async getAllGroups() {
@@ -163,5 +159,13 @@ export class RoomsService {
       return allgroups?.map((group) => group.id);
     }
     return [];
+  }
+
+  //Get a single user
+  async fetchOneRoom(id: string): Promise<Room> {
+    // console.log('inside fetchOneRoom: ', id);
+    const singleRoom = await this.roomModel.findById(id).exec();
+    // console.log(singleRoom);
+    if (singleRoom) return singleRoom.toJSON();
   }
 }
