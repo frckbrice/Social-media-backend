@@ -181,7 +181,7 @@ export class MessagesService {
     return await this.roomService.getSingleRoom(user_id);
   }
 
-  shuffleMessages(array: Message[]) {
+  shuffleMessages(array: any[]) {
     if (array.length <= 1) return array;
     for (let i = array.length - 1; i >= 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));

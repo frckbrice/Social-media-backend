@@ -104,27 +104,27 @@ export class MessagesGateway
     );
 
     // const [groupMembers, allGroups] = await Promise.all([
-    //   await this.messagesService.getGroupMembers(data.receiver_room_id),
-    //   await this.messagesService.getAllTheGroups(),
-    // ]);
-    // console.log('all group members: ', groupMembers);
-    // const tagets = groupMembers?.filter(
-    //   (groupMemberId) => groupMemberId !== data.sender_id,
-    // );
-    // if (allGroups.includes(data.receiver_room_id) && groupMembers.length) {
-    //   for (const userId of groupMembers) {
-    //     console.log('message to distribute: ', message);
-    //     // this.server.to(data.sender_id).to(userId).emit('message', message);
-    //     this.server.to(userId).emit('message', message);
-    //   }
-    //   // this.server.to(data.receiver_room_id).emit('message');
-    //   return;
-    // }
+    await this.messagesService.getGroupMembers(data.receiver_room_id),
+      //   await this.messagesService.getAllTheGroups(),
+      // ]);
+      // console.log('all group members: ', groupMembers);
+      // const tagets = groupMembers?.filter(
+      //   (groupMemberId) => groupMemberId !== data.sender_id,
+      // );
+      // if (allGroups.includes(data.receiver_room_id) && groupMembers.length) {
+      //   for (const userId of groupMembers) {
+      //     console.log('message to distribute: ', message);
+      //     // this.server.to(data.sender_id).to(userId).emit('message', message);
+      //     this.server.to(userId).emit('message', message);
+      //   }
+      //   // this.server.to(data.receiver_room_id).emit('message');
+      //   return;
+      // }
 
-    this.server
-      .to(data?.receiver_room_id)
-      .to(data?.sender_id)
-      .emit('message', message);
+      this.server
+        .to(data?.receiver_room_id)
+        .to(data?.sender_id)
+        .emit('message', message);
   }
 
   @SubscribeMessage('roomMessages')

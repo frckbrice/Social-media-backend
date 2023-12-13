@@ -29,10 +29,10 @@ export class RoomUsersController {
   }
 
   // get all users per room id
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.roomUsersService.findAllUsers(id);
-  }
+  // @Get(':id')
+  // findOne(@Param('id') id: string) {
+  //   return this.roomUsersService.findAllGroupsId(id);
+  // }
 
   @Patch(':id')
   update(
@@ -45,5 +45,12 @@ export class RoomUsersController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.roomUsersService.removeParticipant(id);
+  }
+
+  // find rooms with my_id
+  @Get('/my_dm/:id')
+  findOneByMyId(@Param('id') id: string) {
+    return this.roomUsersService.getAllGroupAndDM(id);
+    // return this.roomsService.getAllGroupAndDM(id);
   }
 }

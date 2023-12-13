@@ -12,7 +12,7 @@ export class CreateRoomUserDto {
 
   @IsString()
   @IsNotEmpty()
-  group_id: string;
+  room_id: string;
 
   @IsString()
   @IsNotEmpty()

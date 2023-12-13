@@ -8,7 +8,7 @@ export class RoomUser extends Document {
   user_id: string;
 
   @Prop({ ref: 'Room', required: true })
-  group_id: string;
+  room_id: string;
 
   @Prop({ enum: ['member', 'admin'], default: 'member' })
   role: string;

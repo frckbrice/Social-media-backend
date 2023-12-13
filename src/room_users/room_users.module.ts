@@ -4,6 +4,7 @@ import { RoomUsersController } from './room_users.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { RoomUser, RoomUserSchema } from './schema/roomUser.schema';
 import { RoomsModule } from 'src/rooms/rooms.module';
+import { UnreadMessagesModule } from 'src/unread_messages/unread_messages.module';
 
 @Module({
   imports: [
@@ -11,6 +12,7 @@ import { RoomsModule } from 'src/rooms/rooms.module';
     MongooseModule.forFeature([
       { name: RoomUser.name, schema: RoomUserSchema },
     ]),
+    UnreadMessagesModule,
   ],
   controllers: [RoomUsersController],
   providers: [RoomUsersService],
