@@ -47,6 +47,7 @@ export class RoomUsersService {
 
   // remove a group participant
   async removeParticipant(id: string) {
+    
     return await this.roomUserModel.findOneAndDelete({
       user_id: id,
     });

@@ -22,6 +22,12 @@ export class RoomUsersController {
     return await this.roomUsersService.create(createRoomUserDto);
   }
 
+  // GET ALL PARTICIPANTS IN A GROUPS
+  // @Get('/all_participants')
+  // async getGroupmemebers() {
+  //   return await this.roomUsersService.
+  // }  
+
   // get all rooms-users
   @Get()
   findAll() {
@@ -42,6 +48,7 @@ export class RoomUsersController {
     return this.roomUsersService.update(+id, updateRoomUserDto);
   }
 
+  // remove a group participant
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.roomUsersService.removeParticipant(id);
