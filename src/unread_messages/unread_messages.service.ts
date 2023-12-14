@@ -4,7 +4,7 @@ import { UpdateUnreadMessageDto } from './dto/update-unread_message.dto';
 import { InjectModel } from '@nestjs/mongoose';
 // import { UnreadMessage } from './schema/unread_messages.schema';
 import { UnreadMessage } from './interface/unread_messages.interface';
-import { Model } from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 
 @Injectable()
 export class UnreadMessagesService {
@@ -19,8 +19,6 @@ export class UnreadMessagesService {
     last_message: string;
     // unread_count: number;
   }): Promise<UnreadMessage> {
-    console.log('inside unread message');
-
     console.log('data from message srvice', data);
     try {
       const existingUnreadMessage = await this.findOneUnreadMessage({
@@ -76,8 +74,8 @@ export class UnreadMessagesService {
   async remove(sender_id: string, receiver_room_id: string) {
     console.log('inside unread message remove');
     const value = await this.unreadMessage.findOne({
-      sender_id: sender_id,
-      receiver_room_id: receiver_room_id,
+      sender_id: new mongoose.Types.ObjectId(sender_id),
+      receiver_room_id: new mongoose.Types.ObjectId(receiver_room_id),
     });
 
     if (value) {

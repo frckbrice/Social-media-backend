@@ -31,7 +31,7 @@ export class UnreadMessagesController {
   // findOne(@Param('id') id: string) {
   //   return this.unreadMessagesService.findOneUnreadMessage(+id);
   // }
-  @Get()
+  @Get(':id')
   findOne(@Body() data: any) {
     return this.unreadMessagesService.findOneUnreadMessage(data);
   }

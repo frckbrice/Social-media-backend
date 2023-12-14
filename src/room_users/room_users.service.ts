@@ -84,8 +84,10 @@ export class RoomUsersService {
 
   // find one room by id
   async getAllGroupMembers(id: string) {
+    console.log('group id: ', id);
     const groupMembers = await this.roomUserModel.find({ room_id: id }).exec();
     if (!groupMembers.length) {
+      console.log('No room with such id');
       throw new NotFoundException('No room with such id');
     }
     // console.log('members of the group: ', groupMembers);
@@ -108,6 +110,7 @@ export class RoomUsersService {
       }),
     );
     if (!membersRoomObjects.length) {
+      console.log('cannot find members room for this groups');
       throw new NotFoundException('cannot find members room for this groups');
     }
 
@@ -123,7 +126,12 @@ export class RoomUsersService {
         await this.roomService.fetchAllRooms(userId),
       ]);
 
-    if (allUnreadMessages && myRoom) {
+    if (
+      allUnreadMessages?.length &&
+      myRoom &&
+      allGroupOfAMember?.length &&
+      allRooms.length
+    ) {
       return allUnreadMessages
         ?.reduce(
           (acc, curr) => {
@@ -135,7 +143,6 @@ export class RoomUsersService {
                 (item?.isGroup &&
                   curr.receiver_room_id.toString() === item.id.toString())
               ) {
-                3;
                 return {
                   ...item,
                   unread_count: curr?.unread_count,
@@ -183,12 +190,13 @@ export class RoomUsersService {
               last_message: item?.last_message,
             };
         })
-        .sort((a, b) => (a.createdAt > b.createdAt ? 1 : -1))
-        ?.filter((item) => item.name);
-      // .reduce((acc, item) => {
-      //   if (!acc.find((curr) => curr.id === item.id)) acc.push(item);
-      //   return acc;
-      // }, []);
+        ?.filter((item) => item.name)
+        ?.reduce((acc, curr) => {
+          if (!acc.find((item) => item.id === curr.id)) {
+            acc.push(curr);
+          }
+          return acc;
+        }, []);
     }
   }
 

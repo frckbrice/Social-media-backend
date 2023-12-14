@@ -1,9 +1,4 @@
-import {
-  HttpException,
-  HttpStatus,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { UpdateRoomDto } from './dto/update-room.dto';
 // import { Room } from './schema/room.schema';
@@ -23,6 +18,7 @@ export class RoomsService {
   ) {}
   // create new room
   async createRoom(createRoomDto: CreateRoomDto): Promise<Room> {
+    console.log('inside room service');
     const existRoom = await this.roomModel
       .findOne({
         user_id: createRoomDto.user_id,
@@ -34,14 +30,17 @@ export class RoomsService {
       return existRoom.toJSON();
     } else {
       // new group
-      console.log('Payload from roomservice b4 else if', createRoomDto);
       if (createRoomDto.isGroup) {
-        console.log('Payload from roomservice in else if', createRoomDto);
-        const newRoom = await this.roomModel.create(createRoomDto);
-
-        return newRoom;
+        const existGroup = await this.roomModel
+          .findOne({
+            image: createRoomDto.image,
+            name: createRoomDto.name,
+          })
+          .exec();
+        if (existGroup) return existGroup.toJSON();
+        else return await this.roomModel.create(createRoomDto);
       }
-      console.log('Payload from roomservice after else if', createRoomDto);
+
       const originalUserRoom = await this.getSingleRoom(createRoomDto.user_id);
 
       // new dm
@@ -52,10 +51,11 @@ export class RoomsService {
         };
         const newRoom = new this.roomModel(newObject);
         return (await newRoom.save()).toJSON();
+      } else if (!originalUserRoom) {
+        // new user
+        const newRoom = new this.roomModel(createRoomDto);
+        return (await newRoom.save()).toJSON();
       }
-      // new user
-      const newRoom = new this.roomModel(createRoomDto);
-      return (await newRoom.save()).toJSON();
     }
   }
 
@@ -66,55 +66,10 @@ export class RoomsService {
   }
   // find one room by id
   async getSingleRoom(id: string): Promise<Room> {
-    const singleRoom = await this.roomModel
-      .findOne({ user_id: id, my_id: '' })
-      .exec();
-    if (!singleRoom) {
-      throw new NotFoundException('No room with such id');
-    }
-    return singleRoom;
+    return await this.roomModel.findOne({ user_id: id, my_id: '' }).exec();
   }
 
   // find room by my_id
-  async findByMyId(id: string): Promise<Room[]> {
-    try {
-      const [allUnreadMessages, myRoomID, allRooms] = await Promise.all([
-        await this.unreadMessages.findAll(),
-        await this.getSingleRoom(id),
-        await this.roomModel.find({ my_id: id }).exec(),
-      ]);
-
-      if (allUnreadMessages && myRoomID) {
-        return allUnreadMessages?.reduce(
-          (acc, curr) => {
-            acc = acc?.map((item: any) =>
-              item.original_dm_roomID === curr.sender_id.toString() &&
-              curr?.receiver_room_id.toString() === myRoomID.id.toString()
-                ? {
-                    ...item,
-                    unread_count: curr?.unread_count,
-                    last_message: curr?.last_message,
-                    updatedAt: curr?.updatedAt,
-                  }
-                : item,
-            );
-            return acc;
-          },
-          [...allRooms],
-        );
-      }
-    } catch (error) {
-      if (error instanceof Error)
-        throw new HttpException(
-          {
-            status: HttpStatus.INTERNAL_SERVER_ERROR,
-            error: 'some thing went wrong',
-          },
-          HttpStatus.INTERNAL_SERVER_ERROR,
-          { cause: { message: 'some thing went wrong' } },
-        );
-    }
-  }
 
   async fetchAllRooms(id: string) {
     return await this.roomModel.find({ my_id: id }).exec();
@@ -162,7 +117,7 @@ export class RoomsService {
 
   //Get a single user
   async fetchOneRoom(id: string): Promise<Room> {
-    console.log('inside fetchOneRoom: ', id);
+    // console.log('inside fetchOneRoom: ', id);
     if (id) {
       const singleRoom = await this.roomModel
         .findById(new mongoose.Types.ObjectId(id))

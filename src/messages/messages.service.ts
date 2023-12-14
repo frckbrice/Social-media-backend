@@ -72,11 +72,6 @@ export class MessagesService {
       //reset unread messages to initial state
       // await this.unreadMessage.remove(sender_id, receiver_room_id);
 
-      await this.updateMessage(sender_id, receiver_room_id, {
-        is_read: true,
-        reaction: '',
-      });
-
       const messages = [...sentMessages, ...receivedMessages];
       // console.log('all messages', messages);
 
@@ -88,23 +83,18 @@ export class MessagesService {
   }
 
   async updateMessage(
-    sender_id: string,
-    receiver_room_id: string,
-    updateMessageDto: UpdateMessageDto,
+    message_id: string,
+    value: string | boolean,
   ): Promise<Message> {
     // const id = new mongoose.Types.ObjectId(messageId);
     try {
-      const updatedMessage = await this.messageModel.findOne({
-        sender_id,
-        receiver_room_id,
+      const updatedMessage = await this.messageModel.findById({
+        _id: new mongoose.Types.ObjectId(message_id),
       });
       if (updatedMessage) {
-        if (typeof updateMessageDto === 'boolean')
-          updatedMessage.is_read = updateMessageDto;
-        else if (typeof updateMessageDto === 'string')
-          updatedMessage.reaction = updateMessageDto;
-
-        return await updatedMessage.save();
+        if (typeof value === 'string') updatedMessage.reaction = value;
+        else if (typeof value === 'boolean') updatedMessage.is_read = value;
+        return (await updatedMessage.save()).toJSON();
       }
     } catch (error) {
       if (error instanceof Error) console.log('error updating messages', error);
@@ -112,11 +102,28 @@ export class MessagesService {
     }
   }
 
+  async markMessageAsRead(sender_id: string, receiver_room_id: string) {
+    const senderID = new mongoose.Types.ObjectId(sender_id);
+    const receivedID = new mongoose.Types.ObjectId(receiver_room_id);
+    const message = await this.messageModel.updateMany(
+      {
+        sender_id: senderID,
+        receiver_room_id: receivedID,
+      },
+      { is_read: true },
+    );
+
+    if (message) {
+      console.log(message);
+    } else throw new HttpException(' No such message', HttpStatus.NOT_FOUND);
+  }
+
   async getGroupMessage(groupId: string, senderId: string): Promise<Message[]> {
     try {
       await this.unreadMessage.remove(senderId, groupId);
+      await this.markMessageAsRead(senderId, groupId);
       const allGroupMessages = await this.messageModel
-        .find({ receiver_room_id: groupId })
+        .find({ receiver_room_id: new mongoose.Types.ObjectId(groupId) })
         .sort('createdAt DESC')
         .exec();
       if (allGroupMessages) return allGroupMessages;
@@ -146,7 +153,7 @@ export class MessagesService {
       sender_id: senderID,
       receiver_room_id: receivedID,
     });
-
+    await this.markMessageAsRead(sender_id, receiver_room_id);
     if (sentMessages) {
       console.log(sentMessages);
       return sentMessages;
@@ -164,7 +171,7 @@ export class MessagesService {
       sender_id: receivedID,
       receiver_room_id: senderID,
     });
-
+    await this.markMessageAsRead(receiver_room_id, sender_id);
     if (receivedMessages) {
       console.log(receivedMessages);
       return receivedMessages;

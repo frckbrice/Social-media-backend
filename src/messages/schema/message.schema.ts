@@ -51,9 +51,9 @@ export const MessageSchema = new mongoose.Schema(
     },
     sender_name: String,
     sender_phone: String,
-    is_read: { type: Boolean, required: true },
-    reaction: String,
-    // timestamp: { type: Date, default: Date.now() },
+    is_read: { type: Boolean, default: true },
+    reaction: { type: String, default: null },
+    // timestamp: { type: String, default: "" },
   },
   { timestamps: true },
 );

@@ -16,9 +16,7 @@ export class UserService {
 
   // create new user
   async create(createUserDto: CreateUserDto): Promise<any> {
-    const createdUser = new this.userModel(createUserDto);
-
-    const email = createdUser.email;
+    const email = createUserDto.email;
     const existEmail = await this.userModel.findOne({ email: email }).exec();
 
     console.log('this is my user', existEmail);
@@ -37,20 +35,22 @@ export class UserService {
         return { ...existRoom, phone: existEmail?.phone };
       }
     }
+    const createdUser = new this.userModel(createUserDto);
     const user = await createdUser.save();
 
     const id = user.id.toString();
-    const newRoom: Room = {
-      name: user?.name,
-      image: user?.image,
-      isGroup: false,
-      user_id: id,
-      my_id: '',
-      original_dm_roomID: '',
-    };
-
-    const newRoomUser: Room = await this.roomService.createRoom(newRoom);
-    return { ...newRoomUser, phone: user?.phone };
+    if (user) {
+      const newRoom: Room = {
+        name: user?.name,
+        image: user?.image,
+        isGroup: false,
+        user_id: id,
+        my_id: '',
+        original_dm_roomID: '',
+      };
+      const newRoomUser: Room = await this.roomService.createRoom(newRoom);
+      return { ...newRoomUser, phone: user?.phone };
+    }
   }
 
   // find all users
