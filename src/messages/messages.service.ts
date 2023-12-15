@@ -156,9 +156,6 @@ export class MessagesService {
           HttpStatus.INTERNAL_SERVER_ERROR,
         );
       }
-    } else {
-      console.log('ccan not get group messages bcause group id is invalid');
-      throw new NotFoundException("can't fing invalid group id message");
     }
   }
 

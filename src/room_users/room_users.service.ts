@@ -23,10 +23,11 @@ export class RoomUsersService {
 
   // Post data in the roomUser table
   async create(createRoomUserDto: CreateRoomUserDto): Promise<RoomUser> {
-    console.log('data from service', createRoomUserDto);
     const createRoomUser = new this.roomUserModel(createRoomUserDto);
     console.log('this is roomuser from service', createRoomUser);
-    return await createRoomUser.save();
+    const room_user = await createRoomUser.save();
+    console.log('room user created', room_user);
+    return room_user;
   }
 
   // get all roomUsers
@@ -89,8 +90,8 @@ export class RoomUsersService {
     console.log('group id: ', id);
     const groupMembers = await this.roomUserModel.find({ room_id: id }).exec();
     if (!groupMembers.length) {
-      console.log('No room with such id');
-      throw new NotFoundException('No room with such id');
+      console.log('no members for this group');
+      throw new NotFoundException('this group does not have members');
     }
     // console.log('members of the group: ', groupMembers);
     const membersRoomObjects: Room[] = await Promise.all(
@@ -98,16 +99,16 @@ export class RoomUsersService {
         const object = await this.roomService.getSingleRoom(roomUser.user_id);
 
         return {
-          name: object.name,
-          image: object.image,
-          isGroup: object.isGroup,
-          user_id: object.user_id,
-          my_id: object.my_id,
-          createdAt: object.createdAt,
-          updatedAt: object.updatedAt,
-          id: object.id,
-          role: roomUser.role,
-          original_dm_roomID: object.original_dm_roomID,
+          name: object?.name,
+          image: object?.image,
+          isGroup: object?.isGroup,
+          user_id: object?.user_id,
+          my_id: object?.my_id,
+          createdAt: object?.createdAt,
+          updatedAt: object?.updatedAt,
+          id: object?.id,
+          role: roomUser?.role,
+          original_dm_roomID: object?.original_dm_roomID,
         };
       }),
     );
@@ -191,7 +192,7 @@ export class RoomUsersService {
       })
       ?.filter((item) => item.name)
       ?.reduce((acc, curr) => {
-        if (!acc.find((item) => item.id === curr.id)) {
+        if (acc.find((item) => item.id !== curr.id)) {
           acc.push(curr);
         }
         return acc;
