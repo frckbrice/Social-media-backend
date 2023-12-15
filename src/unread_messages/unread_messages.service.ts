@@ -17,6 +17,7 @@ export class UnreadMessagesService {
     sender_id: string;
     receiver_room_id: string;
     last_message: string;
+    currentUser?: string;
     // unread_count: number;
   }): Promise<UnreadMessage> {
     console.log('data from message srvice', data);
@@ -25,12 +26,19 @@ export class UnreadMessagesService {
         sender_id: data.sender_id,
         receiver_room_id: data.receiver_room_id,
       });
-      if (existingUnreadMessage)
-        await this.update(data.sender_id, data.receiver_room_id, {
-          unread_count: existingUnreadMessage.unread_count + 1,
-          last_message: data.last_message,
-        });
-      else
+      if (existingUnreadMessage) {
+        if (data.receiver_room_id !== data.currentUser) {
+          await this.update(data.sender_id, data.receiver_room_id, {
+            unread_count: existingUnreadMessage.unread_count + 1,
+            last_message: data.last_message,
+          });
+        } else {
+          await this.update(data.sender_id, data.receiver_room_id, {
+            unread_count: 0,
+            last_message: data.last_message,
+          });
+        }
+      } else
         await this.unreadMessage.create({
           sender_id: data.sender_id,
           receiver_room_id: data.receiver_room_id,
@@ -43,7 +51,7 @@ export class UnreadMessagesService {
     }
   }
 
-  async findAll() {
+  async findAll(): Promise<UnreadMessage[]> {
     return await this.unreadMessage.find().exec();
   }
 

@@ -20,7 +20,7 @@ export class RoomUsersController {
   async create(@Body() createRoomUserDto: CreateRoomUserDto) {
     console.log('from controller', createRoomUserDto);
     return await this.roomUsersService.create(createRoomUserDto);
-  } 
+  }
 
   // get all rooms-users
   @Get()
@@ -50,9 +50,10 @@ export class RoomUsersController {
 
   // find rooms with my_id
   @Get('/my_dm/:id')
-  findOneByMyId(@Param('id') id: string) {
-    return this.roomUsersService.getAllGroupAndDM(id);
-    // return this.roomsService.getAllGroupAndDM(id);
+  async findOneByMyId(@Param('id') id: string) {
+    const resChats = await this.roomUsersService.getAllGroupAndDM(id);
+    console.log('res chats', resChats);
+    return resChats;
   }
 
   // GET ALL PARTICIPANTS IN A GROUPS

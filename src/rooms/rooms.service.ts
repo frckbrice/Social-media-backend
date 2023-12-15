@@ -71,7 +71,8 @@ export class RoomsService {
 
   // find room by my_id
 
-  async fetchAllRooms(id: string) {
+  async fetchAllRooms(id: string): Promise<Room[]> {
+    console.log('Fetching all rooms for id: ' + id);
     return await this.roomModel.find({ my_id: id }).exec();
   }
 
@@ -116,7 +117,7 @@ export class RoomsService {
   }
 
   //Get a single user
-  async fetchOneRoom(id: string): Promise<Room> {
+  async fetchOneRoom(id: string) {
     // console.log('inside fetchOneRoom: ', id);
     if (id) {
       const singleRoom = await this.roomModel
