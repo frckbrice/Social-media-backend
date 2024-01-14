@@ -40,7 +40,7 @@ export class MessagesService {
       const createdMessage = await this.messageModel.create(createMessageDto);
       console.log('value of can_proceed: ', canProceed);
       //activate the counter when the current user is not connected
-      if (createdMessage && canProceed !== createMessageDto.receiver_room_id)
+      if (createdMessage)
         await this.unreadMessage.createUnreadMessage({
           sender_id: createdMessage.sender_id,
           receiver_room_id: createdMessage.receiver_room_id,

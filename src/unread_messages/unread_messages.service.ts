@@ -27,6 +27,7 @@ export class UnreadMessagesService {
         receiver_room_id: data.receiver_room_id,
       });
       if (existingUnreadMessage) {
+        console.log('unread message exist: ', data);
         if (data.receiver_room_id !== data.currentUser) {
           await this.update(data.sender_id, data.receiver_room_id, {
             unread_count: existingUnreadMessage.unread_count + 1,
@@ -38,13 +39,15 @@ export class UnreadMessagesService {
             last_message: data.last_message,
           });
         }
-      } else
+      } else {
+        console.log('unread message not exist: ', data);
         await this.unreadMessage.create({
           sender_id: data.sender_id,
           receiver_room_id: data.receiver_room_id,
           last_message: data.last_message,
           unread_count: 1,
         });
+      }
     } catch (error) {
       if (error instanceof Error) console.log('error creating messages', error);
       return Promise.reject(error);

@@ -30,7 +30,7 @@ export class UserService {
         // original_dm_roomID: '',
       });
       if (existRoom) {
-        console.log('email already exist', existRoom);
+        // console.log('email already exist', existRoom);
 
         return { ...existRoom, phone: existEmail?.phone };
       }

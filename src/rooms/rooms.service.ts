@@ -73,7 +73,7 @@ export class RoomsService {
 
   async fetchAllRooms(id: string): Promise<Room[]> {
     console.log('Fetching all rooms for id: ' + id);
-    return await this.roomModel.find({ my_id: id }).exec();
+    return await this.roomModel.find({ my_id: id, isGroup: false }).exec();
   }
 
   // find One room by id and update

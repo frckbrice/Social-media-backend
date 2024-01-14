@@ -145,17 +145,18 @@ export class RoomUsersService {
             ) {
               return {
                 ...item,
-                unread_count: curr?.unread_count,
-                last_message: curr?.last_message,
+                unread_count: curr.unread_count,
+                last_message: curr.last_message,
                 updatedAt: curr?.updatedAt,
               };
-            } else
+            } else {
               return {
                 ...item,
                 unread_count: 0,
                 last_message: '',
-                updatedAt: '',
+                updatedAt: item?.createdAt,
               };
+            }
           });
         },
         [...joinRoom],
@@ -169,7 +170,7 @@ export class RoomUsersService {
             user_id: item?._doc.user_id,
             my_id: item?._doc.my_id,
             createdAt: item?._doc.createdAt,
-            updatedAt: item?.updatedAt,
+            updatedAt: item?._doc.updatedAt,
             original_dm_roomID: item?._doc.original_dm_roomID,
             id: item?._doc._id,
             unread_count: item.unread_count,
@@ -190,13 +191,7 @@ export class RoomUsersService {
             last_message: item?.last_message,
           };
       })
-      ?.filter((item) => item.name)
-      ?.reduce((acc, curr) => {
-        if (acc.find((item) => item.id !== curr.id)) {
-          acc.push(curr);
-        }
-        return acc;
-      }, []);
+      ?.filter((item) => item.name);
 
     // console.log('all chats', chats);
     return chats;
