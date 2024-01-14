@@ -100,17 +100,17 @@ export class MessagesGateway
       data,
       this.currentUser,
     );
-    return this.server.to(data.receiver_room_id).emit('message', message);
-    // const allGroups = await this.messagesService.getAllTheGroups();
-
-    // if (allGroups.includes(data.receiver_room_id)) {
     // return this.server.to(data.receiver_room_id).emit('message', message);
-    // }
+    const allGroups = await this.messagesService.getAllTheGroups();
 
-    // this.server
-    //   .to(data?.receiver_room_id)
-    //   .to(data?.sender_id)
-    //   .emit('message', message);
+    if (allGroups.includes(data.receiver_room_id)) {
+      return this.server.to(data.receiver_room_id).emit('message', message);
+    }
+
+    this.server
+      .to(data?.receiver_room_id)
+      .to(data?.sender_id)
+      .emit('message', message);
   }
 
   @SubscribeMessage('roomMessages')
